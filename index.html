@@ -1,0 +1,1416 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Clock, Play, Pause, CheckCircle2, XCircle, ChevronLeft, ChevronRight, 
+  RotateCcw, BookOpen, UserCheck, Trophy, Award, Trash2, GraduationCap,
+  Sparkles, FileText, Check, X, AlertCircle
+} from 'lucide-react';
+
+// --- DATA SOAL LENGKAP TKA BAHASA INDONESIA (50 SOAL) ---
+const QUESTIONS_DATA = [
+  // TEKS 1 (1 - 5)
+  {
+    id: 1,
+    textId: 1,
+    title: "Teks 1: Dampak Digitalisasi terhadap Sektor UMKM di Indonesia",
+    passage: `Akselerasi transformasi digital di Indonesia berkembang pesat dalam tiga tahun terakhir. Data Kementerian Koperasi dan UKM menunjukkan bahwa hingga akhir tahun 2025, sebanyak 24 juta Usaha Mikro, Kecil, dan Menengah (UMKM) telah masuk ke dalam ekosistem digital (onboarding). Pemerintah menargetkan angka ini mencapai 30 juta UMKM pada akhir tahun 2026. Digitalisasi memberikan peluang besar bagi UMKM untuk memperluas jangkauan pasar, meningkatkan efisiensi operasional, dan mempermudah akses pembiayaan.
+
+Namun, tantangan yang dihadapi tidaklah mudah. Masalah utama yang sering muncul adalah kesenjangan literasi digital antardaerah, infrastruktur internet yang belum merata di pelosok, serta ancaman keamanan siber (cybersecurity). Banyak pelaku usaha mikro di daerah rural yang belum memahami cara mengoptimalkan platform e-commerce dan strategi pemasaran digital secara aman. Oleh karena itu, program pendampingan yang berkelanjutan mutlak diperlukan, bukan sekadar pelatihan sekali selesai.`,
+    question: "Apa gagasan utama paragraf pertama pada teks di atas?",
+    options: [
+      { key: "A", text: "Pemerintah menargetkan 30 juta UMKM masuk ekosistem digital pada tahun 2026." },
+      { key: "B", text: "Akselerasi transformasi digital memicu perkembangan pesat UMKM di Indonesia." },
+      { key: "C", text: "Manfaat dan perkembangan digitalisasi pada sektor UMKM di Indonesia." },
+      { key: "D", text: "Tantangan berat yang dihadapi oleh pelaku UMKM dalam ekosistem digital." },
+      { key: "E", text: "Data Kementerian Koperasi dan UKM mengenai jumlah pelaku usaha mikro." }
+    ],
+    correctKey: "C",
+    explanation: "Paragraf pertama secara umum membicarakan mengenai pertumbuhan data onboarding UMKM serta berbagai manfaat digitalisasi (perluasan pasar, efisiensi, dan akses pembiayaan). Jadi gagasan utamanya merangkum manfaat dan perkembangan digitalisasi UMKM."
+  },
+  {
+    id: 2,
+    textId: 1,
+    passageRef: "Teks 1: Dampak Digitalisasi terhadap Sektor UMKM di Indonesia",
+    question: "Berdasarkan teks tersebut, manakah yang merupakan salah satu manfaat langsung dari digitalisasi UMKM?",
+    options: [
+      { key: "A", text: "Mengurangi biaya pajak tahunan pelaku usaha secara signifikan." },
+      { key: "B", text: "Menghilangkan seluruh kompetitor bisnis di pasar domestik." },
+      { key: "C", text: "Mempermudah akses pembiayaan dan memperluas jangkauan pasar." },
+      { key: "D", text: "Menjamin keamanan data konsumen dari serangan siber tanpa proteksi tambahan." },
+      { key: "E", text: "Mengubah seluruh sistem produksi manual menjadi otomatisasi robotik." }
+    ],
+    correctKey: "C",
+    explanation: "Sesuai dengan kalimat terakhir paragraf pertama: 'Digitalisasi memberikan peluang besar bagi UMKM untuk memperluas jangkauan pasar, meningkatkan efisiensi operasional, dan mempermudah akses pembiayaan.'"
+  },
+  {
+    id: 3,
+    textId: 1,
+    passageRef: "Teks 1: Dampak Digitalisasi terhadap Sektor UMKM di Indonesia",
+    question: "Makna istilah onboarding dalam konteks teks tersebut adalah...",
+    options: [
+      { key: "A", text: "Proses pemutusan hubungan kerja secara massal lewat sistem daring." },
+      { key: "B", text: "Proses integrasi atau masuknya UMKM ke dalam ekosistem digital." },
+      { key: "C", text: "Kegiatan ekspor produk lokal ke pasar internasional menggunakan kapal." },
+      { key: "D", text: "Pengalihan kepemilikan usaha dari swasta menjadi badan usaha milik negara." },
+      { key: "E", text: "Tahap pendaftaran izin edar resmi pada lembaga kesehatan." }
+    ],
+    correctKey: "B",
+    explanation: "Dalam konteks teks, kalimat '24 juta UMKM telah masuk ke dalam ekosistem digital (onboarding)' menegaskan bahwa onboarding merujuk pada integrasi/masuknya UMKM ke dunia digital."
+  },
+  {
+    id: 4,
+    textId: 1,
+    passageRef: "Teks 1: Dampak Digitalisasi terhadap Sektor UMKM di Indonesia",
+    question: "Mengapa pelatihan sekali selesai dinilai kurang cukup bagi pelaku UMKM di daerah rural?",
+    options: [
+      { key: "A", text: "Karena anggaran pemerintah untuk pelatihan digital sangat terbatas." },
+      { key: "B", text: "Karena mereka membutuhkan pendampingan berkelanjutan untuk memahami optimalisasi platform dan keamanan siber." },
+      { key: "C", text: "Karena pasar e-commerce selalu mengalami penurunan omzet setiap tahunnya." },
+      { key: "D", text: "Karena infrastruktur internet di kota besar sudah terlalu padat." },
+      { key: "E", text: "Karena seluruh pelaku usaha mikro sudah mahir dalam strategi pemasaran digital." }
+    ],
+    correctKey: "B",
+    explanation: "Paragraf kedua menyebutkan pelaku usaha di daerah rural belum memahami optimalisasi platform dan keamanan siber, sehingga memerlukan pendampingan berkelanjutan."
+  },
+  {
+    id: 5,
+    textId: 1,
+    passageRef: "Teks 1: Dampak Digitalisasi terhadap Sektor UMKM di Indonesia",
+    question: "Manakah pernyataan yang tidak sesuai dengan isi teks di atas?",
+    options: [
+      { key: "A", text: "Target pemerintah pada akhir tahun 2026 adalah 30 juta UMKM masuk ekosistem digital." },
+      { key: "B", text: "Kesenjangan literasi digital antardaerah merupakan salah satu tantangan digitalisasi UMKM." },
+      { key: "C", text: "Hingga akhir tahun 2025, tercatat ada 24 juta UMKM yang sudah onboarding." },
+      { key: "D", text: "Masalah infrastruktur internet yang belum merata menjadi hambatan di daerah pelosok." },
+      { key: "E", text: "Digitalisasi membuat UMKM sama sekali bebas dari ancaman kejahatan siber." }
+    ],
+    correctKey: "E",
+    explanation: "Pernyataan E tidak sesuai karena dalam teks secara tegas disebutkan bahwa 'ancaman keamanan siber (cybersecurity)' justru menjadi salah satu masalah utama yang dihadapi UMKM."
+  },
+
+  // TEKS 2 (6 - 10)
+  {
+    id: 6,
+    textId: 2,
+    title: "Teks 2: Transisi Energi Bersih dan Ketahanan Nasional",
+    passage: `Penggunaan energi fosil secara masif selama berdekade-dekade telah memicu krisis iklim global. Sebagai langkah mitigasi, Indonesia berkomitmen mempercepat transisi menuju energi bersih dan terbarukan (EBT) seperti energi surya, angin, dan panas bumi. Selain mengurangi emisi karbon secara drastis, langkah ini strategis untuk menjaga ketahanan energi nasional di masa depan mengingat cadangan minyak bumi konvensional yang terus menipis.
+
+Kendati demikian, investasi awal untuk membangun infrastruktur EBT membutuhkan biaya yang sangat besar. Selain itu, sifat sebagian EBT yang intermiten (tergantung cuaca/waktu) menuntut kesiapan teknologi penyimpanan energi (battery storage) yang canggih agar pasokan listrik tetap stabil. Sinergi antara kebijakan insentif fiskal dari pemerintah dan partisipasi sektor swasta menjadi kunci utama percepatan program ini.`,
+    question: "Kata mitigasi pada paragraf pertama memiliki arti...",
+    options: [
+      { key: "A", text: "Upaya peningkatan hasil produksi." },
+      { key: "B", text: "Tindakan pengurangan atau peredaman dampak bencana/krisis." },
+      { key: "C", text: "Proses pencarian sumber energi alternatif baru." },
+      { key: "D", text: "Evaluasi terhadap kebijakan ekonomi yang gagal." },
+      { key: "E", text: "Pengalihan tanggung jawab dari pemerintah ke masyarakat." }
+    ],
+    correctKey: "B",
+    explanation: "Istilah 'mitigasi' dalam KBBI berarti tindakan atau upaya untuk mengurangi/meredam risiko atau dampak dari suatu ancaman/bencana/krisis."
+  },
+  {
+    id: 7,
+    textId: 2,
+    passageRef: "Teks 2: Transisi Energi Bersih dan Ketahanan Nasional",
+    question: "Apa kelemahan atau tantangan teknis dari Energi Baru Terbarukan (EBT) yang disebutkan dalam teks?",
+    options: [
+      { key: "A", text: "Menghasilkan emisi gas rumah kaca yang lebih beracun daripada batu bara." },
+      { key: "B", text: "Memerlukan lahan yang lebih gersang agar energinya dapat diserap." },
+      { key: "C", text: "Sifatnya yang intermiten atau sangat bergantung pada cuaca dan waktu." },
+      { key: "D", text: "Merusak struktur tanah di sekitar lokasi pembangkit listrik secara permanen." },
+      { key: "E", text: "Tidak didukung sama sekali oleh kebijakan insentif fiskal pemerintah." }
+    ],
+    correctKey: "C",
+    explanation: "Teks paragraf kedua menyebutkan: 'Selain itu, sifat sebagian EBT yang intermiten (tergantung cuaca/waktu) menuntut kesiapan teknologi...'"
+  },
+  {
+    id: 8,
+    textId: 2,
+    passageRef: "Teks 2: Transisi Energi Bersih dan Ketahanan Nasional",
+    question: "Mengapa transisi ke EBT dianggap strategis untuk ketahanan nasional Indonesia?",
+    options: [
+      { key: "A", text: "Karena cadangan minyak bumi konvensional terus menipis." },
+      { key: "B", text: "Karena biaya pembangunan infrastruktur awal sangat murah." },
+      { key: "C", text: "Karena teknologi baterai canggih sudah diproduksi di setiap desa." },
+      { key: "D", text: "Karena sektor swasta menolak penggunaan bahan bakar fosil." },
+      { key: "E", text: "Karena emisi karbon terbukti meningkatkan produktivitas pertanian." }
+    ],
+    correctKey: "A",
+    explanation: "Paragraf pertama menyebutkan: '...menjaga ketahanan energi nasional di masa depan mengingat cadangan minyak bumi konvensional yang terus menipis.'"
+  },
+  {
+    id: 9,
+    textId: 2,
+    passageRef: "Teks 2: Transisi Energi Bersih dan Ketahanan Nasional",
+    question: "Berdasarkan teks, apa yang menjadi kunci utama percepatan program transisi energi bersih?",
+    options: [
+      { key: "A", text: "Penghentian total seluruh operasional pabrik swasta." },
+      { key: "B", text: "Impor massal bahan bakar minyak dari negara tetangga." },
+      { key: "C", text: "Sinergi antara insentif fiskal pemerintah dan partisipasi sektor swasta." },
+      { key: "D", text: "Penurunan tarif listrik secara drastis untuk menarik minat konsumen." },
+      { key: "E", text: "Pembatasan penggunaan kendaraan listrik di area perkotaan." }
+    ],
+    correctKey: "C",
+    explanation: "Kalimat akhir teks berbunyi: 'Sinergi antara kebijakan insentif fiskal dari pemerintah dan partisipasi sektor swasta menjadi kunci utama percepatan program ini.'"
+  },
+  {
+    id: 10,
+    textId: 2,
+    passageRef: "Teks 2: Transisi Energi Bersih dan Ketahanan Nasional",
+    question: "Kalimat yang menunjukkan hubungan sebab-akibat (kausalitas) dalam teks adalah...",
+    options: [
+      { key: "A", text: "Penggunaan energi fosil secara masif selama berdekade-dekade telah memicu krisis iklim global." },
+      { key: "B", text: "Sebagai langkah mitigasi, Indonesia berkomitmen mempercepat transisi menuju energi bersih." },
+      { key: "C", text: "Investasi awal untuk membangun infrastruktur EBT membutuhkan biaya yang besar." },
+      { key: "D", text: "Energi bersih dan terbarukan meliputi energi surya, angin, dan panas bumi." },
+      { key: "E", text: "Sinergi antara kebijakan pemerintah dan swasta menjadi kunci utama." }
+    ],
+    correctKey: "A",
+    explanation: "Kalimat (A) mengekspresikan sebab (penggunaan energi fosil secara masif) dan akibat ('memicu' krisis iklim global)."
+  },
+
+  // TEKS 3 (11 - 15)
+  {
+    id: 11,
+    textId: 3,
+    title: "Teks 3: Fenomena Doomscrolling di Era Informasi Digital",
+    passage: `Di era digital, masyarakat memiliki akses tanpa batas terhadap informasi melalui media sosial. Namun, fenomena baru yang mengkhawatirkan muncul, yakni doomscrolling. Fenomena ini merujuk pada kecenderungan seseorang untuk terus-menerus membaca, menggulir layar, dan mencari berita buruk atau negatif di internet secara kompulsif, meskipun informasi tersebut memicu kecemasan atau kesedihan.
+
+Menurut para psikolog, perilaku ini sering kali dipicu oleh mekanisme pertahanan psikologis manusia yang secara evolusioner cenderung lebih waspada terhadap ancaman atau bahaya. Namun, jika dilakukan secara berlebihan, doomscrolling dapat mengganggu kesehatan mental, menyebabkan insomnia, menurunkan produktivitas, hingga memicu depresi. Mengatur durasi penggunaan gawai (screen time) dan secara sadar mengonsumsi konten-konten positif adalah langkah awal untuk mengatasi kecanduan ini.`,
+    question: "Apa pengertian dari fenomena doomscrolling menurut teks di atas?",
+    options: [
+      { key: "A", text: "Kebiasaan membagikan berita bohong (hoax) ke grup percakapan keluarga." },
+      { key: "B", text: "Kecenderungan mencari dan membaca berita negatif secara terus-menerus dan kompulsif." },
+      { key: "C", text: "Upaya menghapus semua akun media sosial demi ketenangan hidup." },
+      { key: "D", text: "Proses berjualan produk secara daring dengan memanfaatkan algoritma media sosial." },
+      { key: "E", text: "Metode penyembuhan trauma psikologis menggunakan terapi berbasis teknologi virtual." }
+    ],
+    correctKey: "B",
+    explanation: "Kalimat kedua paragraf pertama dengan jelas mendefinisikan doomscrolling sebagai kecenderungan membaca/menggulir berita buruk secara kompulsif."
+  },
+  {
+    id: 12,
+    textId: 3,
+    passageRef: "Teks 3: Fenomena Doomscrolling di Era Informasi Digital",
+    question: "Berdasarkan penjelasan psikolog dalam teks, apa pemicu dasar munculnya perilaku doomscrolling?",
+    options: [
+      { key: "A", text: "Keinginan untuk pamer pengetahuan di media sosial." },
+      { key: "B", text: "Rasa bosan akibat tidak adanya pekerjaan di dunia nyata." },
+      { key: "C", text: "Mekanisme pertahanan psikologis manusia yang cenderung lebih waspada terhadap bahaya." },
+      { key: "D", text: "Dorongan dari algoritma aplikasi yang sengaja merusak gawai pengguna." },
+      { key: "E", text: "Ketiadaan regulasi hukum yang mengatur tentang penyebaran berita di internet." }
+    ],
+    correctKey: "C",
+    explanation: "Paragraf kedua menyatakan: '...dipicu oleh mekanisme pertahanan psikologis manusia yang secara evolusioner cenderung lebih waspada terhadap ancaman atau bahaya.'"
+  },
+  {
+    id: 13,
+    textId: 3,
+    passageRef: "Teks 3: Fenomena Doomscrolling di Era Informasi Digital",
+    question: "Berikut ini adalah dampak buruk dari doomscrolling bagi kesehatan mental dan fisik, kecuali...",
+    options: [
+      { key: "A", text: "Gangguan tidur atau insomnia." },
+      { key: "B", text: "Penurunan produktivitas kerja/belajar." },
+      { key: "C", text: "Memicu timbulnya rasa cemas dan depresi." },
+      { key: "D", text: "Meningkatkan konsentrasi dan daya ingat." },
+      { key: "E", text: "Memperburuk kondisi kesehatan psikologis secara umum." }
+    ],
+    correctKey: "D",
+    explanation: "Meningkatkan konsentrasi adalah hal positif dan bertentangan dengan dampak negatif doomscrolling (menurunkan produktivitas & memicu kecemasan)."
+  },
+  {
+    id: 14,
+    textId: 3,
+    passageRef: "Teks 3: Fenomena Doomscrolling di Era Informasi Digital",
+    question: "Bagaimana solusi awal yang disarankan dalam teks untuk mengatasi doomscrolling?",
+    options: [
+      { key: "A", text: "Membeli gawai baru yang memiliki spesifikasi lebih tinggi." },
+      { key: "B", text: "Mengatur durasi penggunaan gawai dan secara sadar mengonsumsi konten positif." },
+      { key: "C", text: "Melaporkan semua akun berita negatif ke pihak kepolisian." },
+      { key: "D", text: "Berhenti membaca berita sama sekali dan mengisolasi diri dari informasi." },
+      { key: "E", text: "Mengikuti kursus pemrograman komputer agar paham cara kerja internet." }
+    ],
+    correctKey: "B",
+    explanation: "Kalimat terakhir paragraf kedua: 'Mengatur durasi penggunaan gawai (screen time) dan secara sadar mengonsumsi konten-konten positif adalah langkah awal...'"
+  },
+  {
+    id: 15,
+    textId: 3,
+    passageRef: "Teks 3: Fenomena Doomscrolling di Era Informasi Digital",
+    question: "Kata kompulsif pada paragraf pertama memiliki makna...",
+    options: [
+      { key: "A", text: "Berdasarkan perintah hukum atau pengadilan." },
+      { key: "B", text: "Dilakukan secara sadar dan penuh perencanaan yang matang." },
+      { key: "C", text: "Bersifat mendorong atau memaksa secara tidak rasional/tidak terkendali." },
+      { key: "D", text: "Jarang terjadi atau hanya sesekali dilakukan saat senggang." },
+      { key: "E", text: "Menguntungkan secara finansial bagi pelaku tindakan tersebut." }
+    ],
+    correctKey: "C",
+    explanation: "Kompulsif berarti timbul dari dorongan yang kuat dan tidak rasional/sulit dikendalikan untuk melakukan sesuatu."
+  },
+
+  // TEKS 4 (16 - 20)
+  {
+    id: 16,
+    textId: 4,
+    title: "Teks 4: Ketahanan Pangan Lokal: Melirik Kembali Pangan Non-Beras",
+    passage: `Ketergantungan masyarakat Indonesia terhadap beras sebagai sumber karbohidrat utama masih sangat tinggi. Padahal, dari sudut pandang ketahanan pangan dan agroklimat, diversifikasi pangan berbasis komoditas lokal non-beras—seperti sagu, sorgum, singkong, dan jagung—menawarkan solusi yang jauh lebih adaptif terhadap perubahan iklim. Sorgum, misalnya, dikenal sebagai tanaman yang sangat toleran terhadap kekeringan dan dapat tumbuh subur di lahan marginal yang miskin hara, seperti di sebagian wilayah Nusa Tenggara Timur.
+
+Mengubah pola konsumsi masyarakat yang telanjur memiliki dogma "belum makan kalau belum makan nasi" merupakan tantangan kultural terbesar. Pemerintah perlu menggalakkan kampanye diversifikasi pangan secara masif, sekaligus menjamin hilirisasi produk pangan lokal agar memiliki nilai tambah ekonomi dan rasa yang disukai generasi muda. Tanpa adanya diversifikasi, ketahanan pangan nasional akan rapuh menghadapi ancaman krisis iklim global yang mengganggu stabilitas produksi padi.`,
+    question: "Apa tujuan utama penulisan teks tersebut?",
+    options: [
+      { key: "A", text: "Mengkritik kinerja petani padi yang gagal memenuhi target swasembada nasional." },
+      { key: "B", text: "Mempromosikan wilayah Nusa Tenggara Timur sebagai destinasi wisata agrowisata baru." },
+      { key: "C", text: "Mengajak masyarakat dan pemerintah untuk melakukan diversifikasi pangan berbasis komoditas lokal non-beras." },
+      { key: "D", text: "Membuktikan bahwa kualitas gizi singkong jauh lebih tinggi daripada beras putih." },
+      { key: "E", text: "Menjelaskan proses pengolahan tepung sorgum menjadi bahan baku mi instan modern." }
+    ],
+    correctKey: "C",
+    explanation: "Penulis secara keseluruhan mendorong pentingnya mengurangi ketergantungan beras dengan mempromosikan diversifikasi pangan lokal non-beras demi ketahanan pangan nasional."
+  },
+  {
+    id: 17,
+    textId: 4,
+    passageRef: "Teks 4: Ketahanan Pangan Lokal: Melirik Kembali Pangan Non-Beras",
+    question: "Mengapa tanaman sorgum dinilai sangat cocok dikembangkan dalam menghadapi perubahan iklim?",
+    options: [
+      { key: "A", text: "Karena memerlukan pasokan air yang melimpah dan pupuk kimia berdosis tinggi." },
+      { key: "B", text: "Karena sangat toleran terhadap kekeringan dan dapat tumbuh di lahan marginal yang miskin hara." },
+      { key: "C", text: "Karena masa panennya jauh lebih lama dibandingkan komoditas padi konvensional." },
+      { key: "D", text: "Karena hanya bisa ditanam di daerah dengan suhu udara yang sangat dingin." },
+      { key: "E", text: "Karena produk turunannya secara otomatis disukai oleh seluruh generasi muda." }
+    ],
+    correctKey: "B",
+    explanation: "Disebutkan dalam teks: 'Sorgum, misalnya, dikenal sebagai tanaman yang sangat toleran terhadap kekeringan dan dapat tumbuh subur di lahan marginal...'"
+  },
+  {
+    id: 18,
+    textId: 4,
+    passageRef: "Teks 4: Ketahanan Pangan Lokal: Melirik Kembali Pangan Non-Beras",
+    question: "Apa hambatan kultural terbesar dalam menerapkan diversifikasi pangan di Indonesia menurut teks?",
+    options: [
+      { key: "A", text: "Kurangnya modal usaha bagi para petani komoditas non-beras." },
+      { key: "B", text: "Harga komoditas sagu dan jagung yang jauh lebih mahal daripada beras." },
+      { key: "C", text: "Dogma atau mindset masyarakat bahwa 'belum makan kalau belum makan nasi'." },
+      { key: "D", text: "Larangan resmi dari pemerintah untuk mengonsumsi makanan selain beras." },
+      { key: "E", text: "Tidak adanya lahan kosong yang tersisa untuk menanam singkong." }
+    ],
+    correctKey: "C",
+    explanation: "Paragraf kedua menyebutkan: 'Mengubah pola konsumsi masyarakat yang telanjur memiliki dogma \"belum makan kalau belum makan nasi\" merupakan tantangan kultural terbesar.'"
+  },
+  {
+    id: 19,
+    textId: 4,
+    passageRef: "Teks 4: Ketahanan Pangan Lokal: Melirik Kembali Pangan Non-Beras",
+    question: "Kata diversifikasi dalam teks di atas memiliki arti...",
+    options: [
+      { key: "A", text: "Penyeragaman jenis atau bentuk dari suatu komoditas." },
+      { key: "B", text: "Penganekaragaman atau perluasan jenis usaha/pangan untuk menghindari ketergantungan." },
+      { key: "C", text: "Proses impor barang dari luar negeri demi memenuhi kebutuhan pokok." },
+      { key: "D", text: "Pemusnahan massal hama tanaman pangan menggunakan teknologi hayati." },
+      { key: "E", text: "Penurunan harga jual komoditas secara drastis di pasar tradisional." }
+    ],
+    correctKey: "B",
+    explanation: "Diversifikasi adalah penganekaragaman jenis (dalam hal ini sumber pangan) agar tidak tergantung pada satu sumber tunggal."
+  },
+  {
+    id: 20,
+    textId: 4,
+    passageRef: "Teks 4: Ketahanan Pangan Lokal: Melirik Kembali Pangan Non-Beras",
+    question: "Manakah kesimpulan yang paling tepat berdasarkan isi teks tersebut?",
+    options: [
+      { key: "A", text: "Indonesia harus segera menghentikan seluruh produksi padi dan beralih total ke sorgum." },
+      { key: "B", text: "Krisis iklim global tidak akan memengaruhi ketahanan pangan selama pasokan padi aman." },
+      { key: "C", text: "Kampanye diversifikasi pangan dan hilirisasi produk lokal penting untuk menjaga ketahanan pangan dari ancaman krisis iklim." },
+      { key: "D", text: "Rasa pangan lokal secara alamiah mustahil diadopsi atau disukai oleh generasi muda saat ini." },
+      { key: "E", text: "Lahan marginal di NTT adalah satu-satunya tempat yang bisa ditanami komoditas pangan." }
+    ],
+    correctKey: "C",
+    explanation: "Kesimpulan menyeluruh dari teks adalah pentingnya diversifikasi pangan dan hilirisasi produk lokal demi memperkuat ketahanan pangan terhadap iklim."
+  },
+
+  // TEKS 5 (21 - 25)
+  {
+    id: 21,
+    textId: 5,
+    title: "Teks 5: Kecerdasan Buatan (AI) dalam Transformasi Dunia Pendidikan",
+    passage: `Integrasi Kecerdasan Buatan atau Artificial Intelligence (AI) dalam dunia pendidikan telah membawa perubahan paradigma yang masif. Melalui platform pembelajaran adaptif berbasis AI, sistem dapat menganalisis gaya belajar, kecepatan pemahaman, serta kelemahan materi dari masing-masing siswa secara personal. Hal ini memungkinkan terciptanya metode personalized learning, di mana kurikulum dan latihan soal disesuaikan khusus dengan kebutuhan individu siswa, sesuatu yang sulit dicapai dalam metode klasikal konvensional.
+
+Walakin, adopsi AI bukan tanpa cela. Kekhawatiran terbesar terletak pada potensi erosi kemampuan berpikir kritis siswa jika mereka terlalu bergantung pada AI untuk menyelesaikan tugas-tugas analitis. Selain itu, aspek afektif seperti penanaman empati, etika, dan karakter moral tetap merupakan domain mutlak guru manusia yang tidak akan pernah bisa direplikasi oleh baris kode algoritma secanggih apa pun. AI harus ditempatkan sebagai mitra akselerasi, bukan pengganti peran esensial pendidik.`,
+    question: "Apa keunggulan utama platform pembelajaran berbasis AI yang disebutkan dalam teks?",
+    options: [
+      { key: "A", text: "Mampu menggantikan peran guru secara total di dalam kelas sehingga menghemat biaya." },
+      { key: "B", text: "Dapat menganalisis karakteristik belajar siswa secara personal (personalized learning)." },
+      { key: "C", text: "Memberikan kelulusan otomatis kepada seluruh siswa tanpa perlu ujian." },
+      { key: "D", text: "Menghapus materi pelajaran yang dianggap terlalu sulit oleh siswa secara sepihak." },
+      { key: "E", text: "Menjamin siswa terbebas dari tugas-tugas sekolah selama satu semester penuh." }
+    ],
+    correctKey: "B",
+    explanation: "Disebutkan di paragraf pertama bahwa AI dapat menganalisis gaya belajar, kecepatan, dan kelemahan siswa untuk menghadirkan personalized learning."
+  },
+  {
+    id: 22,
+    textId: 5,
+    passageRef: "Teks 5: Kecerdasan Buatan (AI) dalam Transformasi Dunia Pendidikan",
+    question: "Kata Walakin pada awal paragraf kedua merupakan konjungsi yang menyatakan hubungan...",
+    options: [
+      { key: "A", text: "Penambahan atau kelanjutan informasi." },
+      { key: "B", text: "Pertentangan atau perlawanan dari pernyataan sebelumnya." },
+      { key: "C", text: "Sebab-akibat atau konsekuensi logis." },
+      { key: "D", text: "Pemilihan antara dua opsi atau lebih." },
+      { key: "E", text: "Waktu atau urutan kronologis kejadian." }
+    ],
+    correctKey: "B",
+    explanation: "Walakin adalah sinonim baku dari kata 'akan tetapi' atau 'namun', yang mengekspresikan pertentangan/perlawanan (kontrastif)."
+  },
+  {
+    id: 23,
+    textId: 5,
+    passageRef: "Teks 5: Kecerdasan Buatan (AI) dalam Transformasi Dunia Pendidikan",
+    question: "Apa dampak negatif terberat jika siswa terlalu bergantung pada penggunaan AI dalam pendidikan?",
+    options: [
+      { key: "A", text: "Kerusakan fisik pada layar komputer atau gawai milik siswa." },
+      { key: "B", text: "Meningkatnya biaya operasional sekolah untuk membeli lisensi aplikasi." },
+      { key: "C", text: "Potensi terkikisnya (erosi) kemampuan berpikir kritis siswa dalam menganalisis masalah." },
+      { key: "D", text: "Penurunan jumlah guru secara drastis akibat pemutusan hubungan kerja." },
+      { key: "E", text: "Hilangnya minat siswa untuk mengikuti kegiatan ekstrakurikuler olahraga." }
+    ],
+    correctKey: "C",
+    explanation: "Teks paragraf 2: 'Kekhawatiran terbesar terletak pada potensi erosi kemampuan berpikir kritis siswa jika mereka terlalu bergantung pada AI...'"
+  },
+  {
+    id: 24,
+    textId: 5,
+    passageRef: "Teks 5: Kecerdasan Buatan (AI) dalam Transformasi Dunia Pendidikan",
+    question: "Mengapa peran guru tetap tidak tergantikan oleh teknologi AI secanggih apa pun?",
+    options: [
+      { key: "A", text: "Karena guru memiliki kemampuan teknis untuk memperbaiki kerusakan program AI." },
+      { key: "B", text: "Karena aspek afektif seperti empati, etika, dan karakter moral hanya bisa diberikan oleh guru manusia." },
+      { key: "C", text: "Karena biaya untuk menggaji guru jauh lebih murah daripada menyewa server AI." },
+      { key: "D", text: "Karena guru memiliki kendali penuh atas nilai rapor akhir seluruh siswa di sekolah." },
+      { key: "E", text: "Karena platform AI tidak memiliki akses terhadap buku teks kurikulum nasional." }
+    ],
+    correctKey: "B",
+    explanation: "Paragraf 2 menyatakan bahwa aspek afektif (empati, etika, karakter moral) adalah domain mutlak guru manusia yang tidak bisa direplikasi algoritma."
+  },
+  {
+    id: 25,
+    textId: 5,
+    passageRef: "Teks 5: Kecerdasan Buatan (AI) dalam Transformasi Dunia Pendidikan",
+    question: "Posisi ideal AI dalam dunia pendidikan menurut penulis teks tersebut adalah...",
+    options: [
+      { key: "A", text: "Pengganti utama peran pendidik di masa depan." },
+      { key: "B", text: "Alat untuk menghapus sistem evaluasi atau ujian." },
+      { key: "C", text: "Mitra akselerasi, bukan pengganti peran esensial pendidik." },
+      { key: "D", text: "Sistem utama yang menentukan kelulusan siswa secara absolut." },
+      { key: "E", text: "Sarana hiburan pengisi waktu luang saat jam kosong di sekolah." }
+    ],
+    correctKey: "C",
+    explanation: "Kalimat penutup teks berbunyi secara eksplisit: 'AI harus ditempatkan sebagai mitra akselerasi, bukan pengganti peran esensial pendidik.'"
+  },
+
+  // TEKS 6 (26 - 30) - BAGIAN 2: FIKSI & SASTRA
+  {
+    id: 26,
+    textId: 6,
+    title: "Teks 6: Cerpen Laut & Kakek",
+    passage: `Di bawah temaram lampu minyak, kakek masih sibuk dengan jemari tuanya, merajut jala yang koyak akibat terjang karang minggu lalu. Matanya yang mulai lamur sesekali berkedip menahan kantuk. Baginya, jala itu bukan sekadar jalinan benang nilon, melainkan penyambung napas keluarga kami. Sudah tiga hari laut mengamuk, mengirimkan ombak setinggi rumah yang memaksa perahu-perahu kayu bersandar pasrah di tepi pantai. Ayah hanya bisa menatap cakrawala dari balik jendela dengan garis wajah yang semakin menegang memikirkan persediaan beras di dapur yang kian menipis.
+
+"Jangan cemas, Nak," suara kakek memecah keheningan malam, lirih namun sarat keteguhan. "Laut selalu tahu kapan harus marah dan kapan harus memberi. Ia hanya sedang beristirahat, begitu juga kita seharusnya."`,
+    question: "Latar suasana yang tergambar kuat pada paragraf pertama kutipan cerpen di atas adalah...",
+    options: [
+      { key: "A", text: "Ceria dan penuh harapan." },
+      { key: "B", text: "Tegang, sunyi, dan penuh kecemasan." },
+      { key: "C", text: "Riuh rendah dan penuh kegembiraan." },
+      { key: "D", text: "Menakutkan dan mencekam karena perang." },
+      { key: "E", text: "Damai, tenteram, dan romantis." }
+    ],
+    correctKey: "B",
+    explanation: "Penggunaan ungkapan seperti lampu temaram, persediaan beras menipis, wajah menegang, serta laut mengamuk menggambarkan suasana yang sunyi, tegang, dan penuh kecemasan."
+  },
+  {
+    id: 27,
+    textId: 6,
+    passageRef: "Teks 6: Cerpen Laut & Kakek",
+    question: "Apa makna simbolis dari klausa \"jalinan benang nilon, melainkan penyambung napas keluarga kami\" dalam teks?",
+    options: [
+      { key: "A", text: "Jala tersebut merupakan benda pusaka warisan nenek moyang mereka." },
+      { key: "B", text: "Jala itu dibeli dengan harga yang sangat mahal dari luar kota." },
+      { key: "C", text: "Jala tersebut adalah satu-satunya alat kerja yang menjadi sumber mata pencarian untuk bertahan hidup." },
+      { key: "D", text: "Jala itu memiliki kekuatan gaib yang bisa mendatangkan ikan tanpa melaut." },
+      { key: "E", text: "Benang nilon pada jala tersebut dapat digunakan untuk mengobati penyakit." }
+    ],
+    correctKey: "C",
+    explanation: "Kata 'penyambung napas' secara kiasan melambangkan sumber penghidupan utama keluarga nelayan tersebut untuk memenuhi kebutuhan hidup sehari-hari."
+  },
+  {
+    id: 28,
+    textId: 6,
+    passageRef: "Teks 6: Cerpen Laut & Kakek",
+    question: "Bagaimana watak tokoh Kakek berdasarkan kutipan cerpen tersebut?",
+    options: [
+      { key: "A", text: "Pemarah, tidak sabaran, dan suka mengeluh." },
+      { key: "B", text: "Penakut, lemah, dan mudah putus asa menghadapi badai." },
+      { key: "C", text: "Bijaksana, tenang, dan memiliki keteguhan hati." },
+      { key: "D", text: "Acuh tak acuh dan tidak peduli pada nasib keluarganya." },
+      { key: "E", text: "Sombong dan suka meremehkan kemampuan tokoh Ayah." }
+    ],
+    correctKey: "C",
+    explanation: "Tampak dari kata-katanya yang menenangkan ('Jangan cemas, Nak... Laut selalu tahu...'), kakek bersikap bijaksana, tenang, dan teguh."
+  },
+  {
+    id: 29,
+    textId: 6,
+    passageRef: "Teks 6: Cerpen Laut & Kakek",
+    question: "Penyebab konflik (ketegangan batin) yang dialami oleh tokoh Ayah dalam cerita adalah...",
+    options: [
+      { key: "A", text: "Perselisihan paham antara dirinya dengan tokoh Kakek mengenai cara merajut jala." },
+      { key: "B", text: "Laut yang sedang mengamuk sehingga ia tidak bisa melaut, sementara persediaan beras menipis." },
+      { key: "C", text: "Perahunya hancur berkeping-keping akibat menabrak karang yang tajam." },
+      { key: "D", text: "Kakek yang menolak untuk beristirahat meskipun matanya sudah mulai lamur." },
+      { key: "E", text: "Kekhawatiran akan adanya serangan dari perompak laut di malam hari." }
+    ],
+    correctKey: "B",
+    explanation: "Ketegangan batin Ayah dipicu oleh faktor alam (ombak besar/badai) yang menghentikan kegiatan melaut di tengah kondisi persediaan pangan/beras dapur yang kian menipis."
+  },
+  {
+    id: 30,
+    textId: 6,
+    passageRef: "Teks 6: Cerpen Laut & Kakek",
+    question: "Amanat yang dapat dipetik dari ucapan Kakek di akhir cerita adalah...",
+    options: [
+      { key: "A", text: "Kita harus mengeksploitasi laut saat cuaca sedang buruk agar mendapat hasil lebih." },
+      { key: "B", text: "Manusia harus selalu bersabar, berpikir positif, dan menerima siklus alam dengan bijaksana." },
+      { key: "C", text: "Nelayan sebaiknya mencari pekerjaan lain di kota besar jika laut sedang berombak." },
+      { key: "D", text: "Kita tidak boleh mempercayai janji-janji yang diberikan oleh alam sekitar kita." },
+      { key: "E", text: "Jangan pernah merajut jala di malam hari karena dapat merusak kesehatan mata." }
+    ],
+    correctKey: "B",
+    explanation: "Ucapan Kakek mengajarkan agar kita menyikapi kondisi alam dan tantangan hidup dengan kepasrahan yang tenang, bersabar, dan berpikiran positif."
+  },
+
+  // TEKS 7 (31 - 35)
+  {
+    id: 31,
+    textId: 7,
+    title: "Teks 7: Novel Laras & Beasiswa",
+    passage: `Laras melangkah gontai meninggalkan ruang pengumuman itu. Lembar kertas di genggamannya remuk oleh keringat dingin yang mengucur dari telapak tangannya. Angka-angka di atas kertas itu seolah menjelma menjadi belati yang siap menikam impiannya yang telah dirajut selama tiga tahun di bangku SMA. Ia tahu betul, dengan nilai seperti ini, beasiswa kedokteran yang diidam-idamkannya untuk meringankan beban ibunya yang seorang buruh cuci, kini menguap bersama angin sore yang dingin.
+
+Sesampainya di rumah, ibunya sedang sibuk memeras pakaian di ember besar. Melihat kedatangan Laras, wanita paruh baya itu menyeka peluh di dahinya dengan ujung daster yang pudar, lalu melemparkan senyum paling tulus yang pernah ada di dunia. Senyum yang justru membuat pertahanan Laras runtuh, dan air matanya tumpah tak terbendung lagi.`,
+    question: "Majas yang dominan terdapat pada kalimat \"Angka-angka di atas kertas itu seolah menjelma menjadi belati yang siap menikam impiannya\" adalah...",
+    options: [
+      { key: "A", text: "Personifikasi." },
+      { key: "B", text: "Hiperbola." },
+      { key: "C", text: "Metafora." },
+      { key: "D", text: "Asosiasi / Simile." },
+      { key: "E", text: "Ironi." }
+    ],
+    correctKey: "D",
+    explanation: "Penggunaan kata pembanding 'seolah' (seperti/bagaikan/seolah) menandakan majas Asosiasi / Simile, yaitu membandingkan angka-angka dengan belati."
+  },
+  {
+    id: 32,
+    textId: 7,
+    passageRef: "Teks 7: Novel Laras & Beasiswa",
+    question: "Mengapa Laras merasa dunianya hancur setelah melihat lembar pengumuman tersebut?",
+    options: [
+      { key: "A", text: "Karena ia dipecat secara sepihak dari tempat kerjanya." },
+      { key: "B", text: "Karena nilainya tidak mencukupi untuk mendapatkan beasiswa kedokteran yang diharapkan." },
+      { key: "C", text: "Karena ibunya melarang dirinya untuk melanjutkan pendidikan ke perguruan tinggi." },
+      { key: "D", text: "Karena kertas pengumuman miliknya dicuri oleh teman sekelasnya." },
+      { key: "E", text: "Karena ia salah jadwal dan terlambat menghadiri ujian seleksi masuk perguruan tinggi." }
+    ],
+    correctKey: "B",
+    explanation: "Dalam paragraf pertama dijelaskan bahwa nilainya tidak memenuhi syarat beasiswa kedokteran yang ia idam-idamkan untuk membantu ibunya."
+  },
+  {
+    id: 33,
+    textId: 7,
+    passageRef: "Teks 7: Novel Laras & Beasiswa",
+    question: "Sudut pandang pencitraan/penceritaan yang digunakan oleh penulis dalam kutipan novel tersebut adalah...",
+    options: [
+      { key: "A", text: "Orang pertama pelaku utama (Aku)." },
+      { key: "B", text: "Orang pertama pelaku sampingan." },
+      { key: "C", text: "Orang ketiga serbatahu (Dia/Laras)." },
+      { key: "D", text: "Orang kedua sebagai pengamat." },
+      { key: "E", text: "Sudut pandang campuran tak beraturan." }
+    ],
+    correctKey: "C",
+    explanation: "Pengarang menyebut nama tokoh ('Laras', 'Ia') serta mengetahui perasaan batin dan pikiran tokoh Laras secara mendalam (Orang ketiga serbatahu)."
+  },
+  {
+    id: 34,
+    textId: 7,
+    passageRef: "Teks 7: Novel Laras & Beasiswa",
+    question: "Nilai moral/sosial yang terpancar dari sosok Ibu dalam kutipan tersebut adalah...",
+    options: [
+      { key: "A", text: "Keberanian melawan ketidakadilan sistem pendidikan." },
+      { key: "B", text: "Kegigihan bekerja keras mencari nafkah dan ketulusan kasih sayang kepada anaknya." },
+      { key: "C", text: "Keinginan kuat untuk memaksa anaknya menjadi seorang dokter yang kaya raya." },
+      { key: "D", text: "Kepasrahan total tanpa melakukan usaha apa pun untuk mengubah nasib." },
+      { key: "E", text: "Ketidakpedulian terhadap prestasi akademik yang diraih oleh anaknya." }
+    ],
+    correctKey: "B",
+    explanation: "Tampak dari Ibu yang sedang memeras pakaian (buruh cuci/kerja keras) dan memberikan senyuman paling tulus kepada Laras."
+  },
+  {
+    id: 35,
+    textId: 7,
+    passageRef: "Teks 7: Novel Laras & Beasiswa",
+    question: "Arti ungkapan melangkah gontai pada awal paragraf pertama menunjukkan bahwa tokoh Laras berjalan dengan...",
+    options: [
+      { key: "A", text: "Sangat cepat karena terburu-buru dikejar waktu." },
+      { key: "B", text: "Penuh semangat, ceria, dan melompat-lompat kegirangan." },
+      { key: "C", text: "Lemah, lambat, dan tidak bertenaga akibat sedih atau kecewa." },
+      { key: "D", text: "Tegap dan angkuh karena merasa paling hebat di antara yang lain." },
+      { key: "E", text: "Hati-hati karena jalanan yang dilewatinya sangat licin dan berlumpur." }
+    ],
+    correctKey: "C",
+    explanation: "Ungkapan 'gontai' berarti langkah yang lambat, lemas, dan tak bertenaga karena beban kesedihan yang berat."
+  },
+
+  // TEKS 8 (36 - 40)
+  {
+    id: 36,
+    textId: 8,
+    title: "Teks 8: Puisi Sajak Tengah Malam",
+    passage: `Sajak Tengah Malam
+Karya: Anonim
+
+Ke mana perginya riuh kota?
+Saat aspal-aspal berhenti bicara
+Dan lampu merkuri mulai mengeja sepi
+Di ujung gang, rindu mengetuk pintu tua
+Tanpa permisi, tanpa suara
+Menuntut jawab pada sang waktu
+Yang terus berdetak, menggilas usia.`,
+    question: "Citraan (imaji) yang paling dominan pada baris \"Saat aspal-aspal berhenti bicara\" adalah citraan...",
+    options: [
+      { key: "A", text: "Penglihatan." },
+      { key: "B", text: "Pendengaran." },
+      { key: "C", text: "Perabaan." },
+      { key: "D", text: "Penciuman." },
+      { key: "E", text: "Gerak." }
+    ],
+    correctKey: "B",
+    explanation: "Kata 'berhenti bicara' melambangkan keheningan/suara yang tak lagi terdengar, sehingga melibatkan indra pendengaran."
+  },
+  {
+    id: 37,
+    textId: 8,
+    passageRef: "Teks 8: Puisi Sajak Tengah Malam",
+    question: "Kata pintu tua dalam puisi tersebut secara konotatif merujuk pada simbol...",
+    options: [
+      { key: "A", text: "Rumah megah yang baru saja selesai dibangun di pusat kota." },
+      { key: "B", text: "Masa lalu, kenangan lama, atau usia yang sudah senja." },
+      { key: "C", text: "Kejahatan yang tersembunyi di dalam lorong-lorong sempit." },
+      { key: "D", text: "Masa depan yang penuh dengan teknologi canggih." },
+      { key: "E", text: "Alat transportasi tradisional yang sudah tidak digunakan lagi." }
+    ],
+    correctKey: "B",
+    explanation: "Pintu tua secara konotatif memegang simbol batas menuju kenangan lama, masa lalu, atau usia yang kian senja."
+  },
+  {
+    id: 38,
+    textId: 8,
+    passageRef: "Teks 8: Puisi Sajak Tengah Malam",
+    question: "Suasana yang dibangun oleh penyair dalam puisi \"Sajak Tengah Malam\" adalah...",
+    options: [
+      { key: "A", text: "Riang gembira dan penuh optimisme." },
+      { key: "B", text: "Sunyi, melankolis, dan penuh perenungan/kerinduan." },
+      { key: "C", text: "Marah, emosional, dan penuh protes sosial." },
+      { key: "D", text: "Menakutkan, seram, dan penuh misteri mistis." },
+      { key: "E", text: "Lucu, menggelikan, dan menghibur pembaca." }
+    ],
+    correctKey: "B",
+    explanation: "Puisi menggambarkan kota yang sepi, mengeja sepi, rindu yang mengetuk, dan waktu yang menggilas usia; menghadirkan suasana melankolis & kontemplatif."
+  },
+  {
+    id: 39,
+    textId: 8,
+    passageRef: "Teks 8: Puisi Sajak Tengah Malam",
+    question: "Apa maksud dari baris terakhir: \"Yang terus berdetak, menggilas usia\"?",
+    options: [
+      { key: "A", text: "Waktu yang berjalan lambat membuat manusia bosan menunggu." },
+      { key: "B", text: "Penggunaan jam dinding elektronik yang merusak memori manusia." },
+      { key: "C", text: "Waktu yang terus berjalan maju tanpa bisa dihentikan, mengurangi sisa umur manusia." },
+      { key: "D", text: "Usia muda adalah waktu yang paling tepat untuk merusak tatanan kota." },
+      { key: "E", text: "Jam dinding yang rusak akibat hantaman benda keras di tengah malam." }
+    ],
+    correctKey: "C",
+    explanation: "Baris tersebut menggambarkan hakikat waktu yang tidak pernah berhenti dan bertambahnya waktu berarti jatah usia hidup manusia yang terus tergerus."
+  },
+  {
+    id: 40,
+    textId: 8,
+    passageRef: "Teks 8: Puisi Sajak Tengah Malam",
+    question: "Majas personifikasi dalam puisi di atas ditunjukkan pada baris-baris berikut, kecuali...",
+    options: [
+      { key: "A", text: "Aspal-aspal berhenti bicara." },
+      { key: "B", text: "Lampu merkuri mulai mengeja sepi." },
+      { key: "C", text: "Rindu mengetuk pintu tua." },
+      { key: "D", text: "Ke mana perginya riuh kota?" },
+      { key: "E", text: "Sang waktu yang terus berdetak." }
+    ],
+    correctKey: "D",
+    explanation: "Baris D ('Ke mana perginya riuh kota?') adalah kalimat tanya biasa (retoris), bukan benda mati yang diberi sifat berperilaku seperti manusia (personifikasi)."
+  },
+
+  // TEKS 9 (41 - 45)
+  {
+    id: 41,
+    textId: 9,
+    title: "Teks 9: Naskah Drama Hadi & Ibu",
+    passage: `Panggung: Ruang tamu rumah susun yang sederhana. Malam hari.
+
+Hadi: (Melempar tasnya ke kursi dengan kasar, wajahnya merah padam) "Aku tidak tahan lagi, Ibu! Selalu saja Baskoro yang mendapatkan pujian dari kepala bagian. Padahal, laporan analisis itu aku yang mengerjakannya lembur semalaman!"
+
+Ibu: (Menghentikan kegiatan menyulamnya, menatap Hadi dengan lembut) "Tenang dulu, Hadi. Duduklah, minum air hangat ini. Amarah tidak akan pernah mengembalikan hakmu yang dicuri."
+
+Hadi: "Tapi ini tidak adil, Bu! Sampai kapan kita harus mengalah dan hidup serba pas-pasan seperti ini sementara orang lain memetik hasil dari peluhku?"`,
+    question: "Berdasarkan petunjuk lakuan (kramagung) dalam teks, bagaimana kondisi emosi tokoh Hadi?",
+    options: [
+      { key: "A", text: "Sangat gembira karena mendapat bonus gaji." },
+      { key: "B", text: "Sedih dan menangis tersedu-sedu di pojokan." },
+      { key: "C", text: "Sangat marah, kesal, dan merasa tidak adil." },
+      { key: "D", text: "Takut dan gemetar karena dikejar musuh." },
+      { key: "E", text: "Tenang, santai, dan tidak memikirkan pekerjaan." }
+    ],
+    correctKey: "C",
+    explanation: "Kramagung '(Melempar tasnya ke kursi dengan kasar, wajahnya merah padam)' menunjukkan emosi kemarahan dan kejengkolan yang sangat tinggi."
+  },
+  {
+    id: 42,
+    textId: 9,
+    passageRef: "Teks 9: Naskah Drama Hadi & Ibu",
+    question: "Apa yang memicu konflik antartokoh dalam penggalan drama tersebut?",
+    options: [
+      { key: "A", text: "Ibu yang menolak membuatkan Hadi minum air hangat setelah pulang kerja." },
+      { key: "B", text: "Hasil kerja keras Hadi (laporan analisis) diklaim dan dipuji atas nama orang lain (Baskoro)." },
+      { key: "C", text: "Hadi yang merusak tas kerja mahalnya dengan cara melemparnya ke kursi." },
+      { key: "D", text: "Baskoro yang mengusir keluarga Hadi dari rumah susun yang mereka tempati." },
+      { key: "E", text: "Ibu yang memaksa Hadi untuk keluar dari pekerjaannya saat itu juga." }
+    ],
+    correctKey: "B",
+    explanation: "Sumber masalahnya adalah laporan analisis buatan Hadi yang diklaim Baskoro sehingga Baskoro yang memperoleh pujian atasannya."
+  },
+  {
+    id: 43,
+    textId: 9,
+    passageRef: "Teks 9: Naskah Drama Hadi & Ibu",
+    question: "Karakter tokoh Ibu dalam kutipan drama di atas adalah...",
+    options: [
+      { key: "A", text: "Provokatif, ikut memanaskan suasana hati anak." },
+      { key: "B", text: "Penenang, bijaksana, dan penuh kasih sayang." },
+      { key: "C", text: "Penakut, lemah, dan selalu menyalahkan keadaan." },
+      { key: "D", text: "Materialistis, hanya mementingkan uang dan jabatan." },
+      { key: "E", text: "Acuh tak acuh terhadap keluh kesah yang disampaikan anak." }
+    ],
+    correctKey: "B",
+    explanation: "Ibu menghentikan sulamannya, menatap lembut, menawarkan minum, dan memberikan nasihat bijak agar Hadi meredam amarah."
+  },
+  {
+    id: 44,
+    textId: 9,
+    passageRef: "Teks 9: Naskah Drama Hadi & Ibu",
+    question: "Makna kata peluh pada kalimat terakhir dialog Hadi adalah...",
+    options: [
+      { key: "A", text: "Air mata yang keluar karena kesedihan mendalam." },
+      { key: "B", text: "Kerja keras, usaha nyata, dan tetesan keringat dalam bekerja." },
+      { key: "C", text: "Harta benda warisan yang ditinggalkan orang tua." },
+      { key: "D", text: "Pakaian dinas harian yang kotor dan belum dicuci." },
+      { key: "E", text: "Penyakit demam yang diderita akibat kelelahan." }
+    ],
+    correctKey: "B",
+    explanation: "Secara denotatif peluh adalah keringat, tetapi secara konotatif merujuk pada kerja keras dan pengorbanan usaha seseorang."
+  },
+  {
+    id: 45,
+    textId: 9,
+    passageRef: "Teks 9: Naskah Drama Hadi & Ibu",
+    question: "Bagaimana latar tempat kejadian dalam penggalan drama tersebut?",
+    options: [
+      { key: "A", text: "Kantor perusahaan multinasional yang mewah di pusat kota." },
+      { key: "B", text: "Taman bermain anak di dekat kompleks perumahan elite." },
+      { key: "C", text: "Ruang tamu rumah susun yang sederhana." },
+      { key: "D", text: "Sebuah warung kopi di pinggir jalan raya yang ramai." },
+      { key: "E", text: "Stasiun kereta api saat kondisi hujan deras." }
+    ],
+    correctKey: "C",
+    explanation: "Petunjuk panggung di awal naskah drama menuliskan secara eksplisit: 'Panggung: Ruang tamu rumah susun yang sederhana.'"
+  },
+
+  // TEKS 10 (46 - 50)
+  {
+    id: 46,
+    textId: 10,
+    title: "Teks 10: Fabel Kuki & Tiko",
+    passage: `Di sebuah hutan tropis yang lebat, Kuki si Burung Kolibri selalu bangga dengan kecepatan sayapnya. Ia kerap mengejek Tiko si Kura-Kura Darat yang berjalan lamban dan bermata sayu. "Hei Tiko, dengan tokomu yang lambat itu, badai tahunan keburu tiba sebelum kamu sampai di bukit perlindungan!" ejek Kuki sambil terbang berputar-putar di atas kepala Tiko. Tiko tidak membalas, ia hanya tersenyum tipis dan terus melangkah menapaki jalan berbatu secara konsisten.
+
+Ketika musim badai benar-benar menerjang hutan, angin puting beliung merontokkan pepohonan. Kuki yang bertubuh ringan terombang-ambing tak berdaya dihantam angin kencang, sayap indahnya patah karena menabrak ranting. Sementara itu, Tiko dengan tenang menarik seluruh badannya masuk ke dalam tempurung kerasnya yang kokoh, terlindung aman dari segala benturan hingga badai mereda.`,
+    question: "Apa kelemahan tokoh Kuki si Burung Kolibri yang menjadi bumerang bagi dirinya sendiri saat badai?",
+    options: [
+      { key: "A", text: "Tubuhnya terlalu besar sehingga mudah dijadikan sasaran hewan buas." },
+      { key: "B", text: "Sifatnya yang sombong dan tubuhnya yang ringan sehingga tak berdaya dihantam angin kencang badai." },
+      { key: "C", text: "Penglihatan matanya yang sangat buruk di malam hari yang gelap." },
+      { key: "D", text: "Ketidakmampuannya untuk terbang tinggi di atas pohon-pohon besar." },
+      { key: "E", text: "Selalu mendengarkan nasihat dari Tiko si Kura-Kura Darat." }
+    ],
+    correctKey: "B",
+    explanation: "Paragraf kedua memaparkan Kuki yang bertubuh ringan terombang-ambing ditiup angin kencang badai dan kesombongannya membuatnya tak siap."
+  },
+  {
+    id: 47,
+    textId: 10,
+    passageRef: "Teks 10: Fabel Kuki & Tiko",
+    question: "Bagaimana Tiko si Kura-Kura Darat menyelamatkan dirinya dari amukan badai?",
+    options: [
+      { key: "A", text: "Terbang tinggi bermigrasi ke pulau seberang sebelum badai datang." },
+      { key: "B", text: "Bersembunyi di dalam lubang lumpur yang digalinya bersama kawanan cacing." },
+      { key: "C", text: "Menarik seluruh badannya masuk ke dalam tempurung kerasnya yang kokoh." },
+      { key: "D", text: "Meminta bantuan Kuki untuk menggendongnya ke atas bukit perlindungan." },
+      { key: "E", text: "Menggunakan dedaunan lebar sebagai payung pelindung tubuhnya." }
+    ],
+    correctKey: "C",
+    explanation: "Kalimat terakhir teks: 'Tiko dengan tenang menarik seluruh badannya masuk ke dalam tempurung kerasnya yang kokoh...'"
+  },
+  {
+    id: 48,
+    textId: 10,
+    passageRef: "Teks 10: Fabel Kuki & Tiko",
+    question: "Pesan moral implisit dari kutipan fabel tersebut adalah...",
+    options: [
+      { key: "A", text: "Kecepatan fisik adalah satu-satunya penentu keselamatan dalam hidup." },
+      { key: "B", text: "Jangan pernah berjalan lambat jika tidak ingin ditinggalkan oleh teman-teman." },
+      { key: "C", text: "Jangan sombong atas kelebihanmu, karena setiap makhluk memiliki pertahanan dan kelebihannya masing-masing." },
+      { key: "D", text: "Kita harus selalu menebang pohon di hutan sebelum musim badai tahunan tiba." },
+      { key: "E", text: "Bertubuh ringan adalah sebuah kerugian mutlak bagi semua jenis burung." }
+    ],
+    correctKey: "C",
+    explanation: "Cerita fabel mengajarkan agar tidak sombong meremehkan orang lain, sebab tiap kelemahan bisa menyimpan kelebihan perlindungan tersendiri."
+  },
+  {
+    id: 49,
+    textId: 10,
+    passageRef: "Teks 10: Fabel Kuki & Tiko",
+    question: "Kata konsisten pada paragraf pertama bermakna...",
+    options: [
+      { key: "A", text: "Berubah-ubah sesuai dengan situasi dan kondisi sekitar." },
+      { key: "B", text: "Tetap pada pendirian, taat asas, dan terus-menerus dilakukan secara selaras." },
+      { key: "C", text: "Dilakukan dengan rasa malas dan keterpaksaan yang tinggi." },
+      { key: "D", text: "Mengikuti arahan atau perintah dari individu yang lebih berkuasa." },
+      { key: "E", text: "Memiliki kecepatan yang melebihi batas rata-rata makhluk lain." }
+    ],
+    correctKey: "B",
+    explanation: "Konsisten berarti teguh pada pendirian, taat pada aturan/pola, serta dikerjakan secara berkelanjutan dan selaras."
+  },
+  {
+    id: 50,
+    textId: 10,
+    passageRef: "Teks 10: Fabel Kuki & Tiko",
+    question: "Struktur teks fabel pada paragraf kedua dalam teori sastra disebut sebagai tahapan...",
+    options: [
+      { key: "A", text: "Orientasi (pengenalan tokoh dan latar)." },
+      { key: "B", text: "Komplikasi (awal munculnya masalah awal)." },
+      { key: "C", text: "Resolusi / Koda (penyelesaian masalah dan akibat akhir)." },
+      { key: "D", text: "Abstrak (ringkasan inti cerita sebelum dimulai)." },
+      { key: "E", text: "Krisis (puncak perselisihan antartokoh utama)." }
+    ],
+    correctKey: "C",
+    explanation: "Paragraf kedua memperlihatkan resolusi akhir: saat badai menerjang, akibat akhir dialami Kuki (sayap patah) dan Tiko selamat di tempurungnya."
+  }
+];
+
+export default function App() {
+  // --- STATE MANAJEMEN ---
+  const [viewState, setViewState] = useState('welcome'); // 'welcome', 'quiz', 'results'
+  const [studentInfo, setStudentInfo] = useState({ name: '', classRoom: '' });
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // Jawaban siswa: { [questionId]: { selectedKey: 'A', isCorrect: true/false, timestamp: ... } }
+  const [answers, setAnswers] = useState({});
+  
+  // Timer: 60 menit = 3600 detik
+  const [timeLeft, setTimeLeft] = useState(3600);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  
+  // Riwayat Pengerjaan dari LocalStorage
+  const [history, setHistory] = useState([]);
+
+  // Load history dari LocalStorage
+  useEffect(() => {
+    try {
+      const savedHistory = localStorage.getItem('tryout_tka_history');
+      if (savedHistory) {
+        setHistory(JSON.parse(savedHistory));
+      }
+    } catch (e) {
+      console.error("Gagal memuat history", e);
+    }
+  }, []);
+
+  // Timer Effect
+  useEffect(() => {
+    let interval = null;
+    if (isTimerActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && isTimerActive) {
+      setIsTimerActive(false);
+      finishQuiz();
+    }
+    return () => clearInterval(interval);
+  }, [isTimerActive, timeLeft]);
+
+  // Format detik ke MM:SS
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Mulai Tryout
+  const startQuiz = (e) => {
+    if (e) e.preventDefault();
+    if (!studentInfo.name.trim() || !studentInfo.classRoom.trim()) {
+      alert("Harap isi Nama Lengkap dan Kelas terlebih dahulu!");
+      return;
+    }
+    setAnswers({});
+    setCurrentIndex(0);
+    setTimeLeft(3600);
+    setIsTimerActive(true);
+    setViewState('quiz');
+  };
+
+  // Memilih Jawaban
+  const handleSelectOption = (question, optionKey) => {
+    // Jika soal ini sudah dijawab benar, kuncinya tetap. Tapi sesuai instruksi interaktif:
+    const isCorrect = optionKey === question.correctKey;
+    setAnswers(prev => ({
+      ...prev,
+      [question.id]: {
+        selectedKey: optionKey,
+        isCorrect: isCorrect,
+        explanation: question.explanation
+      }
+    }));
+  };
+
+  // Selesai Tryout
+  const finishQuiz = () => {
+    setIsTimerActive(false);
+    
+    // Hitung Skor
+    let correctCount = 0;
+    Object.keys(answers).forEach(qId => {
+      if (answers[qId].isCorrect) correctCount++;
+    });
+    
+    const score = Math.round((correctCount / QUESTIONS_DATA.length) * 100);
+    const timeSpentSeconds = 3600 - timeLeft;
+    const minutesSpent = Math.floor(timeSpentSeconds / 60);
+    const remainingSecs = timeSpentSeconds % 60;
+    const timeSpentStr = `${minutesSpent} m ${remainingSecs} s`;
+
+    const newRecord = {
+      id: Date.now(),
+      name: studentInfo.name,
+      classRoom: studentInfo.classRoom,
+      score: score,
+      correctCount: correctCount,
+      wrongCount: QUESTIONS_DATA.length - correctCount,
+      totalQuestions: QUESTIONS_DATA.length,
+      timeSpent: timeSpentStr,
+      date: new Date().toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      })
+    };
+
+    const updatedHistory = [newRecord, ...history];
+    setHistory(updatedHistory);
+    try {
+      localStorage.setItem('tryout_tka_history', JSON.stringify(updatedHistory));
+    } catch (e) {
+      console.error("Gagal menyimpan ke localStorage", e);
+    }
+
+    setViewState('results');
+  };
+
+  // Hapus Seluruh Riwayat
+  const clearHistory = () => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus seluruh riwayat pengerjaan siswa?")) {
+      setHistory([]);
+      localStorage.removeItem('tryout_tka_history');
+    }
+  };
+
+  const currentQuestion = QUESTIONS_DATA[currentIndex];
+  const currentAnswer = answers[currentQuestion.id];
+
+  // Temukan teks bacaan untuk soal ini (jika ada)
+  const currentPassageObj = QUESTIONS_DATA.find(q => q.textId === currentQuestion.textId && q.passage);
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+      {/* --- HEADER UTAMA --- */}
+      <header className="bg-gradient-to-r from-indigo-700 via-indigo-800 to-blue-900 text-white shadow-lg sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center space-x-3">
+            <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-md border border-white/20">
+              <GraduationCap className="w-7 h-7 text-indigo-200" />
+            </div>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight">Tryout TKA Bahasa Indonesia</h1>
+              <p className="text-xs md:text-sm text-indigo-200 font-medium">
+                Tingkat SMA • <span className="text-yellow-300 font-semibold">Dibuat oleh Bu Ning</span>
+              </p>
+            </div>
+          </div>
+
+          {/* TIMER CONTROL & NAVIGATION STATUS */}
+          {viewState === 'quiz' && (
+            <div className="flex items-center gap-3">
+              <div className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg border font-mono font-bold text-lg shadow-sm transition-all ${
+                timeLeft < 600 ? 'bg-red-500/20 border-red-400 text-red-200 animate-pulse' : 'bg-white/10 border-white/20 text-white'
+              }`}>
+                <Clock className="w-5 h-5 text-indigo-200" />
+                <span>{formatTime(timeLeft)}</span>
+              </div>
+              <button
+                onClick={() => setIsTimerActive(!isTimerActive)}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+                title={isTimerActive ? "Jeda Waktu" : "Lanjutkan Waktu"}
+              >
+                {isTimerActive ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              </button>
+              <button
+                onClick={() => {
+                  if (window.confirm("Apakah Anda yakin ingin menyelesaikan tryout lebih awal?")) {
+                    finishQuiz();
+                  }
+                }}
+                className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-xs md:text-sm rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                Selesai
+              </button>
+            </div>
+          )}
+
+          {viewState !== 'quiz' && (
+            <div className="text-xs text-indigo-200 flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg">
+              <Sparkles className="w-4 h-4 text-yellow-300" />
+              <span>Simulasi Soal Standar TKA</span>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* --- KONTEN UTAMA --- */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col">
+        {/* ================= TAMPILAN 1: WELCOME / FORM AWAL ================= */}
+        {viewState === 'welcome' && (
+          <div className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 my-auto py-4">
+            {/* CARD FORM SISWA */}
+            <div className="md:col-span-2 bg-white rounded-2xl p-6 md:p-8 shadow-md border border-slate-200 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-3 text-indigo-700 mb-3">
+                  <BookOpen className="w-7 h-7" />
+                  <h2 className="text-2xl font-bold">Selamat Datang di Tryout!</h2>
+                </div>
+                <p className="text-slate-600 text-sm mb-6 leading-relaxed">
+                  Silakan isi identitas diri Anda sebelum memulai tes. Tes ini terdiri dari <strong className="text-slate-800">50 soal pilihan ganda</strong> dengan durasi total <strong className="text-slate-800">60 menit</strong>. Setiap soal dilengkapi dengan penjelasan interaktif mendalam.
+                </p>
+
+                <form onSubmit={startQuiz} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Nama Lengkap Siswa</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Contoh: Ahmad Rizky Pradana"
+                      value={studentInfo.name}
+                      onChange={(e) => setStudentInfo({ ...studentInfo, name: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Kelas / Rombel</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Contoh: XII MIPA 1"
+                      value={studentInfo.classRoom}
+                      onChange={(e) => setStudentInfo({ ...studentInfo, classRoom: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm"
+                    />
+                  </div>
+
+                  <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100 text-xs text-indigo-900 space-y-1">
+                    <p className="font-semibold flex items-center gap-1.5">
+                      <AlertCircle className="w-4 h-4 text-indigo-600" /> Informasi Aturan Pembahasan:
+                    </p>
+                    <ul className="list-disc list-inside space-y-0.5 text-indigo-800 pl-1">
+                      <li>Jawaban <strong>Salah</strong> akan ditandai berwarna merah beserta penjelasan penyebab salah.</li>
+                      <li>Jawaban <strong>Benar</strong> ditandai warna hijau dan memberi tahu kunci jawaban yang tepat.</li>
+                      <li>Timer berjalan 60 menit dan otomatis tersimpan ke daftar nilai setelah selesai.</li>
+                    </ul>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full mt-2 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-base"
+                  >
+                    <Play className="w-5 h-5 fill-current" />
+                    Mulai Kerjakan Tryout Sekarang
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* RINGKASAN INFORMASI */}
+            <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex flex-col justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b flex items-center gap-2">
+                  <Award className="w-5 h-5 text-indigo-600" />
+                  Struktur Materi Soal
+                </h3>
+
+                <div className="space-y-3 text-xs text-slate-600">
+                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <p className="font-bold text-slate-800">Bagian 1: Teks Informasi</p>
+                    <p>Soal 1 – 25 (UMKM Digital, EBT, Doomscrolling, Ketahanan Pangan, AI Pendidikan)</p>
+                  </div>
+                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <p className="font-bold text-slate-800">Bagian 2: Teks Sastra & Fiksi</p>
+                    <p>Soal 26 – 50 (Cerpen Laut, Novel Laras, Puisi Sajak Malam, Drama, Fabel Kuki & Tiko)</p>
+                  </div>
+                </div>
+              </div>
+
+              {history.length > 0 && (
+                <button
+                  onClick={() => setViewState('results')}
+                  className="mt-6 w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-colors flex items-center justify-center gap-2"
+                >
+                  <UserCheck className="w-4 h-4" />
+                  Lihat Riwayat Pengerjaan ({history.length} Siswa)
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAMPILAN 2: SOAL & SIMULASI QUIZ ================= */}
+        {viewState === 'quiz' && (
+          <div className="flex flex-col gap-5">
+            {/* SUB-HEADER NAVIGASI NOMOR SOAL */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 bg-indigo-100 text-indigo-800 font-bold rounded-lg text-sm">
+                  Soal {currentIndex + 1} dari {QUESTIONS_DATA.length}
+                </span>
+                <span className="text-xs text-slate-500 hidden sm:inline">
+                  • {studentInfo.name} ({studentInfo.classRoom})
+                </span>
+              </div>
+
+              {/* QUICK NAVIGATOR DROPDOWN / GRID EXPANDER */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+                  disabled={currentIndex === 0}
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-4 h-4" /> Sebelum
+                </button>
+                <button
+                  onClick={() => setCurrentIndex(prev => Math.min(QUESTIONS_DATA.length - 1, prev + 1))}
+                  disabled={currentIndex === QUESTIONS_DATA.length - 1}
+                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white rounded-lg text-xs font-semibold flex items-center gap-1"
+                >
+                  Berikut <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* SPLIT PANEL: BACAAN TEKS (KIRI) vs SOAL & PILIHAN (KANAN) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* PANEL BACAAN TEKS */}
+              <div className="lg:col-span-6 bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-slate-200 h-full max-h-[600px] overflow-y-auto flex flex-col">
+                <div className="flex items-center gap-2 text-indigo-700 font-bold text-sm mb-3 pb-2 border-b">
+                  <FileText className="w-4 h-4" />
+                  <span>{currentPassageObj ? currentPassageObj.title : (currentQuestion.passageRef || "Teks Bacaan")}</span>
+                </div>
+                <div className="prose prose-slate prose-sm max-w-none text-slate-700 leading-relaxed space-y-3 whitespace-pre-line text-xs md:text-sm">
+                  {currentPassageObj ? currentPassageObj.passage : "Silakan merujuk pada teks bacaan utama."}
+                </div>
+              </div>
+
+              {/* PANEL SOAL & OPSI JAWABAN */}
+              <div className="lg:col-span-6 bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-sm md:text-base font-bold text-slate-800 mb-4 leading-snug">
+                    {currentQuestion.id}. {currentQuestion.question}
+                  </h3>
+
+                  {/* OPSI JAWABAN */}
+                  <div className="space-y-2.5 mb-5">
+                    {currentQuestion.options.map((opt) => {
+                      const isSelected = currentAnswer?.selectedKey === opt.key;
+                      const isCorrectKey = currentQuestion.correctKey === opt.key;
+                      
+                      let btnStyle = "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100";
+                      let icon = null;
+
+                      if (currentAnswer) {
+                        if (isSelected) {
+                          if (currentAnswer.isCorrect) {
+                            btnStyle = "bg-emerald-50 border-emerald-500 text-emerald-900 ring-2 ring-emerald-400 font-semibold";
+                            icon = <Check className="w-5 h-5 text-emerald-600 ml-auto shrink-0" />;
+                          } else {
+                            btnStyle = "bg-rose-50 border-rose-500 text-rose-900 ring-2 ring-rose-400 font-semibold";
+                            icon = <X className="w-5 h-5 text-rose-600 ml-auto shrink-0" />;
+                          }
+                        } else if (isCorrectKey && !currentAnswer.isCorrect) {
+                          // Tunjukkan kunci benar jika jawaban salah
+                          btnStyle = "bg-emerald-50/70 border-emerald-300 text-emerald-800 font-medium";
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={opt.key}
+                          onClick={() => handleSelectOption(currentQuestion, opt.key)}
+                          className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 text-xs md:text-sm ${btnStyle}`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                              isSelected 
+                                ? (currentAnswer?.isCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white')
+                                : 'bg-slate-200 text-slate-700'
+                            }`}>
+                              {opt.key}
+                            </span>
+                            <span className="mt-0.5">{opt.text}</span>
+                          </div>
+                          {icon}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* KOTAK PENJELASAN INTERAKTIF (MUNCUL JIKA SUDAH DIJAWAB) */}
+                  {currentAnswer && (
+                    <div className={`p-4 rounded-xl border text-xs md:text-sm transition-all animate-fadeIn ${
+                      currentAnswer.isCorrect 
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-900' 
+                        : 'bg-rose-50 border-rose-200 text-rose-900'
+                    }`}>
+                      <div className="flex items-center gap-2 font-bold mb-1.5">
+                        {currentAnswer.isCorrect ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            <span className="text-emerald-700">Jawaban Anda Benar!</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-4 h-4 text-rose-600" />
+                            <span className="text-rose-700">Jawaban Anda Salah (Kunci: {currentQuestion.correctKey})</span>
+                          </>
+                        )}
+                      </div>
+                      <p className="leading-relaxed text-slate-700 mt-1">
+                        <strong className="text-slate-800">Pembahasan:</strong> {currentAnswer.explanation}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* BOTTOM ACTION BUTTON */}
+                <div className="mt-6 pt-4 border-t flex justify-between items-center">
+                  <span className="text-xs text-slate-500">
+                    {Object.keys(answers).length} dari 50 Soal Dijawab
+                  </span>
+                  {currentIndex < QUESTIONS_DATA.length - 1 ? (
+                    <button
+                      onClick={() => setCurrentIndex(prev => prev + 1)}
+                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5"
+                    >
+                      Soal Berikutnya <ChevronRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={finishQuiz}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5"
+                    >
+                      <CheckCircle2 className="w-4 h-4" /> Submit Semua Jawaban
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* PETA SOAL (QUESTION NAVIGATOR GRID 1 - 50) */}
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-indigo-600" /> Peta Navigasi Soal (1 - 50)
+              </h4>
+              <div className="grid grid-cols-5 sm:grid-cols-10 md:grid-cols-25 gap-2">
+                {QUESTIONS_DATA.map((q, idx) => {
+                  const ans = answers[q.id];
+                  let gridStyle = "bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200";
+                  
+                  if (ans) {
+                    if (ans.isCorrect) gridStyle = "bg-emerald-500 text-white font-bold border-emerald-600";
+                    else gridStyle = "bg-rose-500 text-white font-bold border-rose-600";
+                  }
+
+                  if (idx === currentIndex) {
+                    gridStyle += " ring-2 ring-indigo-600 ring-offset-1";
+                  }
+
+                  return (
+                    <button
+                      key={q.id}
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`h-9 w-full rounded-lg text-xs border transition-all flex items-center justify-center ${gridStyle}`}
+                    >
+                      {idx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex items-center gap-4 mt-3 text-[11px] text-slate-500">
+                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-slate-200 rounded-sm"></span> Belum Dijawab</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-emerald-500 rounded-sm"></span> Jawaban Benar</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-rose-500 rounded-sm"></span> Jawaban Salah</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAMPILAN 3: HASIL & TABEL SKOR SISWA ================= */}
+        {viewState === 'results' && (
+          <div className="space-y-6 my-auto py-4">
+            {/* CARD SKOR SAYA */}
+            {history.length > 0 && (
+              <div className="bg-gradient-to-r from-indigo-900 to-blue-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div>
+                    <span className="px-3 py-1 bg-white/20 rounded-full text-xs text-indigo-200 font-semibold">
+                      Hasil Tryout Terakhir
+                    </span>
+                    <h2 className="text-2xl font-extrabold mt-2">{history[0].name}</h2>
+                    <p className="text-xs text-indigo-200">Kelas: {history[0].classRoom} • {history[0].date}</p>
+                    
+                    <div className="flex items-center gap-4 mt-4 text-xs">
+                      <div className="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                         Benar: <strong className="text-emerald-400">{history[0].correctCount}</strong>
+                      </div>
+                      <div className="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                         Salah: <strong className="text-rose-400">{history[0].wrongCount}</strong>
+                      </div>
+                      <div className="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                         Waktu: <strong className="text-yellow-300">{history[0].timeSpent}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* LARGE SCORE BADGE */}
+                  <div className="flex flex-col items-center justify-center bg-white/10 p-5 rounded-2xl border border-white/20 min-w-[140px]">
+                    <span className="text-xs text-indigo-200 uppercase tracking-widest font-semibold">Skor Akhir</span>
+                    <span className="text-5xl font-black text-yellow-300 my-1">{history[0].score}</span>
+                    <span className="text-[10px] text-indigo-200">dari 100 Poin</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TABEL HASIL PENGERJAAN SISWA */}
+            <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-200">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-yellow-500" />
+                    Daftar Nilai & Siswa yang Sudah Mengerjakan
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Data ini tersimpan secara otomatis di sistem browser.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setViewState('welcome')}
+                    className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5"
+                  >
+                    <RotateCcw className="w-4 h-4" /> Coba Ulang Tryout
+                  </button>
+                  {history.length > 0 && (
+                    <button
+                      onClick={clearHistory}
+                      className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs transition-colors"
+                      title="Hapus Semua Data"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {history.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 text-sm">
+                  Belum ada siswa yang mengerjakan tryout ini.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-slate-700">
+                    <thead className="bg-slate-100 text-slate-800 uppercase text-[10px] tracking-wider font-bold">
+                      <tr>
+                        <th className="py-3 px-4 rounded-l-lg">No</th>
+                        <th className="py-3 px-4">Nama Siswa</th>
+                        <th className="py-3 px-4">Kelas</th>
+                        <th className="py-3 px-4 text-center">Skor</th>
+                        <th className="py-3 px-4 text-center">Benar / Salah</th>
+                        <th className="py-3 px-4 text-center">Waktu Tempuh</th>
+                        <th className="py-3 px-4 rounded-r-lg">Tanggal Pengerjaan</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {history.map((item, index) => (
+                        <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-3 px-4 font-semibold text-slate-500">{index + 1}</td>
+                          <td className="py-3 px-4 font-bold text-slate-800">{item.name}</td>
+                          <td className="py-3 px-4 text-slate-600">{item.classRoom}</td>
+                          <td className="py-3 px-4 text-center">
+                            <span className={`px-2.5 py-1 rounded-full font-extrabold ${
+                              item.score >= 75 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                            }`}>
+                              {item.score}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span className="text-emerald-600 font-bold">{item.correctCount} B</span> / <span className="text-rose-600 font-bold">{item.wrongCount} S</span>
+                          </td>
+                          <td className="py-3 px-4 text-center font-mono text-slate-600">{item.timeSpent}</td>
+                          <td className="py-3 px-4 text-slate-500">{item.date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* --- FOOTER --- */}
+      <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500">
+        Tryout TKA Bahasa Indonesia SMA • Modul Interaktif Pembahasan • Dibuat oleh <strong>Bu Ning</strong>
+      </footer>
+    </div>
+  );
+}
