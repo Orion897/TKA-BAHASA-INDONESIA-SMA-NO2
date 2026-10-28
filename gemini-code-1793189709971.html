@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tryout TKA Bahasa Indonesia - Bu Ning</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; margin: 0; padding: 16px; }
+        .container { max-width: 960px; margin: 0 auto; }
+        .header { background: #4338ca; color: white; padding: 16px 24px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 1.25rem; }
+        .header p { margin: 4px 0 0 0; font-size: 0.875rem; color: #c7d2fe; }
+        .timer { background: #312e81; padding: 8px 16px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 1.1rem; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media(min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
+        .text-box { background: #f1f5f9; padding: 16px; border-radius: 8px; max-height: 420px; overflow-y: auto; font-size: 0.9rem; line-height: 1.6; border: 1px solid #e2e8f0; }
+        .opt-btn { width: 100%; text-align: left; padding: 12px; margin-bottom: 8px; border: 1px solid #cbd5e1; background: white; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; }
+        .opt-btn:hover { background: #f8fafc; }
+        .correct { background-color: #dcfce7 !important; border-color: #22c55e !important; color: #14532d; font-weight: bold; }
+        .wrong { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #7f1d1d; font-weight: bold; }
+        .explanation { margin-top: 16px; padding: 14px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; color: #9f1239; font-size: 0.9rem; }
+        .next-btn { background: #e11d48; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .nav-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 20px; }
+        .num-btn { width: 34px; height: 34px; border-radius: 6px; border: none; background: #e2e8f0; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        .num-btn.active { outline: 3px solid #4338ca; }
+        .num-btn.c-correct { background: #22c55e; color: white; }
+        .num-btn.c-wrong { background: #ef4444; color: white; }
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; }
+        .submit-btn { width: 100%; background: #4338ca; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; text-align: left; }
+        th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+        th { background: #e0e7ff; color: #3730a3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Tryout TKA Bahasa Indonesia (SMA)</h1>
+                <p>Dibuat oleh Bu Guru Baiq Nining Sekarsih</p>
+            </div>
+            <div id="timer-box" class="timer" style="display:none;">60:00</div>
+        </div>
+
+        <div id="main-content" class="card">
+            <!-- Form Login -->
+            <div id="login-screen" style="max-width: 400px; margin: 30px auto; text-align: center;">
+                <h2 style="color: #4338ca; margin-bottom: 20px;">Silakan Masuk</h2>
+                <div class="form-group">
+                    <label>Nama Lengkap:</label>
+                    <input type="text" id="input-nama" placeholder="Masukkan nama Anda" required>
+                </div>
+                <div class="form-group">
+                    <label>Kelas:</label>
+                    <input type="text" id="input-kelas" placeholder="Contoh: XII IPA 1" required>
+                </div>
+                <button onclick="startQuiz()" class="submit-btn">Mulai Ujian</button>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div id="quiz-screen" style="display:none;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem;">
+                    <span id="txt-bagian" style="color: #64748b; font-weight: 600;"></span>
+                    <span id="txt-nomor" style="color: #4338ca; font-weight: bold;"></span>
+                </div>
+                <div class="grid">
+                    <div class="text-box">
+                        <strong style="color: #312e81;">Teks Bacaan:</strong>
+                        <p id="txt-bacaan" style="white-space: pre-line; margin-top: 8px;"></p>
+                    </div>
+                    <div>
+                        <h3 id="txt-soal" style="font-size: 1rem; margin-top: 0;"></h3>
+                        <div id="options-box"></div>
+                        <div id="exp-box" class="explanation" style="display:none;"></div>
+                    </div>
+                </div>
+                <div id="nav-box" class="nav-grid"></div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="result-screen" style="display:none; text-align: center;">
+                <h2 style="color: #4338ca;">Ujian Selesai!</h2>
+                <p id="result-text"></p>
+                <div style="text-align: left; margin-top: 24px;">
+                    <h3>📋 Daftar Siswa yang Telah Mengerjakan:</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Siswa</th>
+                                <th>Kelas</th>
+                                <th>Skor</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const teksData = {
+            t1: "Dampak Digitalisasi terhadap Sektor UMKM di Indonesia\n\nAkselerasi transformasi digital di Indonesia berkembang pesat dalam tiga tahun terakhir. Data Kementerian Koperasi dan UKM menunjukkan bahwa hingga akhir tahun 2025, sebanyak 24 juta Usaha Mikro, Kecil, dan Menengah (UMKM) telah masuk ke dalam ekosistem digital (onboarding). Pemerintah menargetkan angka ini mencapai 30 juta UMKM pada akhir tahun 2026. Digitalisasi memberikan peluang besar bagi UMKM untuk memperluas jangkauan pasar, meningkatkan efisiensi operasional, dan mempermudah akses pembiayaan.\n\nNamun, tantangan yang dihadapi tidaklah mudah. Masalah utama yang sering muncul adalah kesenjangan literasi digital antardaerah, infrastruktur internet yang belum merata di pelosok, serta ancaman keamanan siber (cybersecurity). Banyak pelaku usaha mikro di daerah rural yang belum memahami cara mengoptimalkan platform e-commerce dan strategi pemasaran digital secara aman. Oleh karena itu, program pendampingan yang berkelanjutan mutlak diperlukan, bukan sekadar pelatihan sekali selesai.",
+            t2: "Transisi Energi Bersih dan Ketahanan Nasional\n\nPenggunaan energi fosil secara masif selama berdekade-dekade telah memicu krisis iklim global. Sebagai langkah mitigasi, Indonesia berkomitmen mempercepat transisi menuju energi bersih dan terbarukan (EBT) seperti energi surya, angin, dan panas bumi. Selain mengurangi emisi karbon secara drastis, langkah ini strategis untuk menjaga ketahanan energi nasional di masa depan mengingat cadangan minyak bumi konvensional yang terus menipis.\n\nKendati demikian, investasi awal untuk membangun infrastruktur EBT membutuhkan biaya yang sangat besar. Selain itu, sifat sebagian EBT yang intermiten (tergantung cuaca/waktu) menuntut kesiapan teknologi penyimpanan energi (battery storage) yang canggih agar pasokan listrik tetap stabil. Sinergi antara kebijakan insentif fiskal dari pemerintah dan partisipasi sektor swasta menjadi kunci utama percepatan program ini.",
+            t3: "Fenomena Doomscrolling di Era Informasi Digital\n\nDi era digital, masyarakat memiliki akses tanpa batas terhadap informasi melalui media sosial. Namun, fenomena baru yang mengkhawatirkan muncul, yakni doomscrolling. Fenomena ini merujuk pada kecenderungan seseorang untuk terus-menerus membaca, menggulir layar, dan mencari berita buruk atau negatif di internet secara kompulsif, meskipun informasi tersebut memicu kecemasan atau kesedihan.\n\nMenurut para psikolog, perilaku ini sering kali dipicu oleh mekanisme pertahanan psikologis manusia yang secara evolusioner cenderung lebih waspada terhadap ancaman atau bahaya. Namun, jika dilakukan secara berlebihan, doomscrolling dapat mengganggu kesehatan mental, menyebabkan insomnia, menurunkan produktivitas, hingga memicu depresi. Mengatur durasi penggunaan gawai (screen time) dan secara sadar mengonsumsi konten-konten positif adalah langkah awal untuk mengatasi kecanduan ini.",
+            t4: "Ketahanan Pangan Lokal: Melirik Kembali Pangan Non-Beras\n\nKetergantungan masyarakat Indonesia terhadap beras sebagai sumber karbohidrat utama masih sangat tinggi. Padahal, dari sudut pandang ketahanan pangan dan agroklimat, diversifikasi pangan berbasis komoditas lokal non-beras—seperti sagu, sorgum, singkong, dan jagung—menawarkan solusi yang jauh lebih adaptif terhadap perubahan iklim. Sorgum, misalnya, dikenal sebagai tanaman yang sangat toleran terhadap kekeringan dan dapat tumbuh subur di lahan marginal yang miskin hara, seperti di sebagian wilayah Nusa Tenggara Timur.\n\nMengubah pola konsumsi masyarakat yang telanjur memiliki dogma \"belum makan kalau belum makan nasi\" merupakan tantangan kultural terbesar. Pemerintah perlu menggalakkan kampanye diversifikasi pangan secara masif, sekaligus menjamin hilirisasi produk pangan lokal agar memiliki nilai tambah ekonomi dan rasa yang disukai generasi muda. Tanpa adanya diversifikasi, ketahanan pangan nasional akan rapuh menghadapi ancaman krisis iklim global yang mengganggu stabilitas produksi padi.",
+            t5: "Kecerdasan Buatan (AI) dalam Transformasi Dunia Pendidikan\n\nIntegrasi Kecerdasan Buatan atau Artificial Intelligence (AI) dalam dunia pendidikan telah membawa perubahan paradigma yang masif. Melalui platform pembelajaran adaptif berbasis AI, sistem dapat menganalisis gaya belajar, kecepatan pemahaman, serta kelemahan materi dari masing-masing siswa secara personal. Hal ini memungkinkan terciptanya metode personalized learning, di mana kurikulum dan latihan soal disesuaikan khusus dengan kebutuhan individu siswa, sesuatu yang sulit dicapai dalam metode klasikal konvensional.\n\nWalakin, adopsi AI bukan tanpa cela. Kekhawatiran terbesar terletak pada potensi erosi kemampuan berpikir kritis siswa jika mereka terlalu bergantung pada AI untuk menyelesaikan tugas-tugas analitis. Selain itu, aspek afektif seperti penanaman empati, etika, dan karakter moral tetap merupakan domain mutlak guru manusia yang tidak akan pernah bisa direplikasi oleh baris kode algoritma secanggih apa pun. AI harus ditempatkan sebagai mitra akselerasi, bukan pengganti peran esensial pendidik.",
+            t6: "Kutipan Cerpen\n\nDi bawah temaram lampu minyak, kakek masih sibuk dengan jemari tuanya, merajut jala yang koyak akibat terjang karang minggu lalu. Matanya yang mulai lamur sesekali berkedip menahan kantuk. Baginya, jala itu bukan sekadar jalinan benang nilon, melainkan penyambung napas keluarga kami. Sudah tiga hari laut mengamuk, mengirimkan ombak setinggi rumah yang memaksa perahu-perahu kayu bersandar pasrah di tepi pantai. Ayah hanya bisa menatap cakrawala dari balik jendela dengan garis wajah yang semakin menegang memikirkan persediaan beras di dapur yang kian menipis.\n\n\"Jangan cemas, Nak,\" suara kakek memecah keheningan malam, lirih namun sarat keteguhan. \"Laut selalu tahu kapan harus marah dan kapan harus memberi. Ia hanya sedang beristirahat, begitu juga kita seharusnya.\"",
+            t7: "Kutipan Novel\n\nLaras melangkah gontai meninggalkan ruang pengumuman itu. Lembar kertas di genggamannya remuk oleh keringat dingin yang mengucur dari telapak tangannya. Angka-angka di atas kertas itu seolah menjelma menjadi belati yang siap menikam impiannya yang telah dirajut selama tiga tahun di bangku SMA. Ia tahu betul, dengan nilai seperti ini, beasiswa kedokteran yang diidam-idamkannya untuk meringankan beban ibunya yang seorang buruh cuci, kini menguap bersama angin sore yang dingin.\n\nSesampainya di rumah, ibunya sedang sibuk memeras pakaian di ember besar. Melihat kedatangan Laras, wanita paruh baya itu menyeka peluh di dahinya dengan ujung daster yang pudar, lalu melemparkan senyum paling tulus yang pernah ada di dunia. Senyum yang justru membuat pertahanan Laras runtuh, dan air matanya tumpah tak terbendung lagi.",
+            t8: "Kutipan Puisi\n\nSajak Tengah Malam\nKarya: Anonim\n\nKe mana perginya riuh kota?\nSaat aspal-aspal berhenti bicara\nDan lampu merkuri mulai mengeja sepi\nDi ujung gang, rindu mengetuk pintu tua\nTanpa permisi, tanpa suara\nMenuntut jawab pada sang waktu\nYang terus berdetak, menggilas usia.",
+            t9: "Kutipan Drama\n\nPanggung: Ruang tamu rumah susun yang sederhana. Malam hari.\n\nHadi: (Melempar tasnya ke kursi dengan kasar, wajahnya merah padam) \"Aku tidak tahan lagi, Ibu! Selalu saja Baskoro yang mendapatkan pujian dari kepala bagian. Padahal, laporan analisis itu aku yang mengerjakannya lembur semalaman!\"\nIbu: (Menghentikan kegiatan menyulamnya, menatap Hadi dengan lembut) \"Tenang dulu, Hadi. Duduklah, minum air hangat ini. Amarah tidak akan pernah mengembalikan hakmu yang dicuri.\"\nHadi: \"Tapi ini tidak adil, Bu! Sampai kapan kita harus mengalah dan hidup serba pas-pasan seperti ini sementara orang lain memetik hasil dari peluhku?\"",
+            t10: "Kutipan Fabel Modern\n\nDi sebuah hutan tropis yang lebat, Kuki si Burung Kolibri selalu bangga dengan kecepatan sayapnya. Ia kerap mengejek Tiko si Kura-Kura Darat yang berjalan lamban dan bermata sayu. \"Hei Tiko, dengan tokomu yang lambat itu, badai tahunan keburu tiba sebelum kamu sampai di bukit perlindungan!\" ejek Kuki sambil terbang berputar-putar di atas kepala Tiko. Tiko tidak membalas, ia hanya tersenyum tipis dan terus melangkah menapaki jalan berbatu secara konsisten.\n\nKetika musim badai benar-benar menerjang hutan, angin puting beliung merontokkan pepohonan. Kuki yang bertubuh ringan terombang-ambing tak berdaya dihantam angin kencang, sayap indahnya patah karena menabrak ranting. Sementara itu, Tiko dengan tenang menarik seluruh badannya masuk ke dalam tempurung kerasnya yang kokoh, terlindung aman dari segala benturan hingga badai mereda."
+        };
+
+        const soalData = [
+            // Soal 1-5
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t1, pertanyaan: "1. Apa gagasan utama paragraf pertama pada teks di atas?", opsi: ["A. Pemerintah menargetkan 30 juta UMKM masuk ekosistem digital pada tahun 2026.", "B. Akselerasi transformasi digital memicu perkembangan pesat UMKM di Indonesia.", "C. Manfaat dan perkembangan digitalisasi pada sektor UMKM di Indonesia.", "D. Tantangan berat yang dihadapi oleh pelaku UMKM dalam ekosistem digital.", "E. Data Kementerian Koperasi dan UKM mengenai jumlah pelaku usaha mikro."], kunci: 2, pembahasan: "Jawaban: C. Gagasan utama paragraf pertama mencakup perkembangan pesat digitalisasi serta manfaatnya (memperluas jangkauan pasar, efisiensi, akses pembiayaan)." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t1, pertanyaan: "2. Berdasarkan teks tersebut, manakah yang merupakan salah satu manfaat langsung dari digitalisasi UMKM?", opsi: ["A. Mengurangi biaya pajak tahunan pelaku usaha secara signifikan.", "B. Menghilangkan seluruh kompetitor bisnis di pasar domestik.", "C. Mempermudah akses pembiayaan dan memperluas jangkauan pasar.", "D. Menjamin keamanan data konsumen dari serangan siber tanpa proteksi tambahan.", "E. Mengubah seluruh sistem produksi manual menjadi otomatisasi robotik."], kunci: 2, pembahasan: "Jawaban: C. Pada paragraf 1 disebutkan: 'Digitalisasi memberikan peluang besar bagi UMKM untuk memperluas jangkauan pasar... dan mempermudah akses pembiayaan.'" },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t1, pertanyaan: "3. Makna istilah onboarding dalam konteks teks tersebut adalah...", opsi: ["A. Proses pemutusan hubungan kerja secara massal lewat sistem daring.", "B. Proses integrasi atau masuknya UMKM ke dalam ekosistem digital.", "C. Kegiatan ekspor produk lokal ke pasar internasional menggunakan kapal.", "D. Pengalihan kepemilikan usaha dari swasta menjadi badan usaha milik negara.", "E. Tahap pendaftaran izin edar resmi pada lembaga kesehatan."], kunci: 1, pembahasan: "Jawaban: B. Istilah onboarding dalam teks merujuk pada proses masuk atau terintegrasinya UMKM ke dalam ekosistem digital." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t1, pertanyaan: "4. Mengapa pelatihan sekali selesai dinilai kurang cukup bagi pelaku UMKM di daerah rural?", opsi: ["A. Karena anggaran pemerintah untuk pelatihan digital sangat terbatas.", "B. Karena mereka membutuhkan pendampingan berkelanjutan untuk memahami optimalisasi platform dan keamanan siber.", "C. Karena pasar e-commerce selalu mengalami penurunan omzet setiap tahunnya.", "D. Karena infrastruktur internet di kota besar sudah terlalu padat.", "E. Karena seluruh pelaku usaha mikro sudah mahir dalam strategi pemasaran digital."], kunci: 1, pembahasan: "Jawaban: B. Paragraf 2 menyatakan banyak pelaku usaha rural belum paham optimasi platform dan keamanan siber, sehingga butuh pendampingan berkelanjutan." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t1, pertanyaan: "5. Manakah pernyataan yang tidak sesuai dengan isi teks di atas?", opsi: ["A. Target pemerintah pada akhir tahun 2026 adalah 30 juta UMKM masuk ekosistem digital.", "B. Kesenjangan literasi digital antardaerah merupakan salah satu tantangan digitalisasi UMKM.", "C. Hingga akhir tahun 2025, tercatat ada 24 juta UMKM yang sudah onboarding.", "D. Masalah infrastruktur internet yang belum merata menjadi hambatan di daerah pelosok.", "E. Digitalisasi membuat UMKM sama sekali bebas dari ancaman kejahatan siber."], kunci: 4, pembahasan: "Jawaban: E. Pernyataan E bertentangan dengan teks yang menyebutkan ancaman keamanan siber (cybersecurity) justru menjadi tantangan utama." },
+            
+            // Soal 6-10
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t2, pertanyaan: "6. Kata mitigasi pada paragraf pertama memiliki arti...", opsi: ["A. Upaya peningkatan hasil produksi.", "B. Tindakan pengurangan atau peredaman dampak bencana/krisis.", "C. Proses pencarian sumber energi alternatif baru.", "D. Evaluasi terhadap kebijakan ekonomi yang gagal.", "E. Pengalihan tanggung jawab dari pemerintah ke masyarakat."], kunci: 1, pembahasan: "Jawaban: B. Mitigasi berarti tindakan untuk mengurangi atau memperkecil dampak risiko/bencana/krisis iklim." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t2, pertanyaan: "7. Apa kelemahan atau tantangan teknis dari Energi Baru Terbarukan (EBT) yang disebutkan dalam teks?", opsi: ["A. Menghasilkan emisi gas rumah kaca yang lebih beracun daripada batu bara.", "B. Memerlukan lahan yang lebih gersang agar energinya dapat diserap.", "C. Sifatnya yang intermiten atau sangat bergantung pada cuaca dan waktu.", "D. Merusak struktur tanah di sekitar lokasi pembangkit listrik secara permanen.", "E. Tidak didukung sama sekali oleh kebijakan insentif fiskal pemerintah."], kunci: 2, pembahasan: "Jawaban: C. Paragraf 2 secara jelas menyebutkan bahwa sifat sebagian EBT adalah intermiten (tergantung cuaca/waktu)." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t2, pertanyaan: "8. Mengapa transisi ke EBT dianggap strategis untuk ketahanan nasional Indonesia?", opsi: ["A. Karena cadangan minyak bumi konvensional terus menipis.", "B. Karena biaya pembangunan infrastruktur awal sangat murah.", "C. Karena teknologi baterai canggih sudah diproduksi di setiap desa.", "D. Karena sektor swasta menolak penggunaan bahan bakar fosil.", "E. Karena emisi karbon terbukti meningkatkan produktivitas pertanian."], kunci: 0, pembahasan: "Jawaban: A. Paragraf 1 menyatakan langkah ini strategis mengingat cadangan minyak bumi konvensional yang terus menipis." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t2, pertanyaan: "9. Berdasarkan teks, apa yang menjadi kunci utama percepatan program transisi energi bersih?", opsi: ["A. Penghentian total seluruh operasional pabrik swasta.", "B. Impor massal bahan bakar minyak dari negara tetangga.", "C. Sinergi antara insentif fiskal pemerintah dan partisipasi sektor swasta.", "D. Penurunan tarif listrik secara drastis untuk menarik minat konsumen.", "E. Pembatasan penggunaan kendaraan listrik di area perkotaan."], kunci: 2, pembahasan: "Jawaban: C. Kalimat terakhir teks menegaskan sinergi antara insentif fiskal pemerintah dan sektor swasta menjadi kunci utama." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t2, pertanyaan: "10. Kalimat yang menunjukkan hubungan sebab-akibat (kausalitas) dalam teks adalah...", opsi: ["A. Penggunaan energi fosil secara masif selama berdekade-dekade telah memicu krisis iklim global.", "B. Sebagai langkah mitigasi, Indonesia berkomitmen mempercepat transisi menuju energi bersih.", "C. Investasi awal untuk membangun infrastruktur EBT membutuhkan biaya yang besar.", "D. Energi bersih dan terbarukan meliputi energi surya, angin, dan panas bumi.", "E. Sinergi antara kebijakan pemerintah dan swasta menjadi kunci utama."], kunci: 0, pembahasan: "Jawaban: A. Penggunaan energi fosil secara masif (Sebab) memicu krisis iklim global (Akibat)." },
+
+            // Soal 11-15
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t3, pertanyaan: "11. Apa pengertian dari fenomena doomscrolling menurut teks di atas?", opsi: ["A. Kebiasaan membagikan berita bohong (hoax) ke grup percakapan keluarga.", "B. Kecenderungan mencari dan membaca berita negatif secara terus-menerus dan kompulsif.", "C. Upaya menghapus semua akun media sosial demi ketenangan hidup.", "D. Proses berjualan produk secara daring dengan memanfaatkan algoritma media sosial.", "E. Metode penyembuhan trauma psikologis menggunakan terapi berbasis teknologi virtual."], kunci: 1, pembahasan: "Jawaban: B. Paragraf 1 mendefinisikan doomscrolling sebagai kecenderungan terus-menerus membaca dan mencari berita buruk/negatif secara kompulsif." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t3, pertanyaan: "12. Berdasarkan penjelasan psikolog dalam teks, apa pemicu dasar munculnya perilaku doomscrolling?", opsi: ["A. Keinginan untuk pamer pengetahuan di media sosial.", "B. Rasa bosan akibat tidak adanya pekerjaan di dunia nyata.", "C. Mekanisme pertahanan psikologis manusia yang cenderung lebih waspada terhadap bahaya.", "D. Dorongan dari algoritma aplikasi yang sengaja merusak gawai pengguna.", "E. Ketiadaan regulasi hukum yang mengatur tentang penyebaran berita di internet."], kunci: 2, pembahasan: "Jawaban: C. Paragraf 2 menjelaskan perilaku ini dipicu mekanisme pertahanan psikologis manusia yang lebih waspada terhadap ancaman/bahaya." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t3, pertanyaan: "13. Berikut ini adalah dampak buruk dari doomscrolling bagi kesehatan mental dan fisik, kecuali...", opsi: ["A. Gangguan tidur atau insomnia.", "B. Penurunan produktivitas kerja/belajar.", "C. Memicu timbulnya rasa cemas dan depresi.", "D. Meningkatkan konsentrasi dan daya ingat.", "E. Memperburuk kondisi kesehatan psikologis secara umum."], kunci: 3, pembahasan: "Jawaban: D. Meningkatkan konsentrasi bukan dampak buruk, melainkan hal positif yang kontradiktif dengan isi teks." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t3, pertanyaan: "14. Bagaimana solusi awal yang disarankan dalam teks untuk mengatasi doomscrolling?", opsi: ["A. Membeli gawai baru yang memiliki spesifikasi lebih tinggi.", "B. Mengatur durasi penggunaan gawai dan secara sadar mengonsumsi konten positif.", "C. Melaporkan semua akun berita negatif ke pihak kepolisian.", "D. Berhenti membaca berita sama sekali dan mengisolasi diri dari informasi.", "E. Mengikuti kursus pemrograman komputer agar paham cara kerja internet."], kunci: 1, pembahasan: "Jawaban: B. Kalimat terakhir teks menyarankan mengatur screen time dan secara sadar mengonsumsi konten positif." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t3, pertanyaan: "15. Kata kompulsif pada paragraf pertama memiliki makna...", opsi: ["A. Berdasarkan perintah hukum atau pengadilan.", "B. Dilakukan secara sadar dan penuh perencanaan yang matang.", "C. Bersifat mendorong atau memaksa secara tidak rasional/tidak terkendali.", "D. Jarang terjadi atau hanya sesekali dilakukan saat senggang.", "E. Menguntungkan secara finansial bagi pelaku tindakan tersebut."], kunci: 2, pembahasan: "Jawaban: C. Kompulsif berarti ada dorongan psikologis yang memaksa atau tidak terkendali secara rasional." },
+
+            // Soal 16-20
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t4, pertanyaan: "16. Apa tujuan utama penulisan teks tersebut?", opsi: ["A. Mengkritik kinerja petani padi yang gagal memenuhi target swasembada nasional.", "B. Mempromosikan wilayah Nusa Tenggara Timur sebagai destinasi wisata agrowisata baru.", "C. Mengajak masyarakat dan pemerintah untuk melakukan diversifikasi pangan berbasis komoditas lokal non-beras.", "D. Membuktikan bahwa kualitas gizi singkong jauh lebih tinggi daripada beras putih.", "E. Menjelaskan proses pengolahan tepung sorgum menjadi bahan baku mi instan modern."], kunci: 2, pembahasan: "Jawaban: C. Teks bertujuan mengajak diversifikasi pangan lokal non-beras untuk menghadapi ancaman krisis iklim." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t4, pertanyaan: "17. Mengapa tanaman sorgum dinilai sangat cocok dikembangkan dalam menghadapi perubahan iklim?", opsi: ["A. Karena memerlukan pasokan air yang melimpah dan pupuk kimia berdosis tinggi.", "B. Karena sangat toleran terhadap kekeringan dan dapat tumbuh di lahan marginal yang miskin hara.", "C. Karena masa panennya jauh lebih lama dibandingkan komoditas padi konvensional.", "D. Karena hanya bisa ditanam di daerah dengan suhu udara yang sangat dingin.", "E. Karena produk turunannya secara otomatis disukai oleh seluruh generasi muda."], kunci: 1, pembahasan: "Jawaban: B. Paragraf 1 menyebutkan sorgum sangat toleran terhadap kekeringan dan tumbuh di lahan marginal miskin hara." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t4, pertanyaan: "18. Apa hambatan kultural terbesar dalam menerapkan diversifikasi pangan di Indonesia menurut teks?", opsi: ["A. Kurangnya modal usaha bagi para petani komoditas non-beras.", "B. Harga komoditas sagu dan jagung yang jauh lebih mahal daripada beras.", "C. Dogma atau mindset masyarakat bahwa \"belum makan kalau belum makan nasi\".", "D. Larangan resmi dari pemerintah untuk mengonsumsi makanan selain beras.", "E. Tidak adanya lahan kosong yang tersisa untuk menanam singkong."], kunci: 2, pembahasan: "Jawaban: C. Paragraf 2 menegaskan hambatan kultural terbesar adalah dogma 'belum makan kalau belum makan nasi'." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t4, pertanyaan: "19. Kata diversifikasi dalam teks di atas memiliki arti...", opsi: ["A. Penyeragaman jenis atau bentuk dari suatu komoditas.", "B. Penganekaragaman atau perluasan jenis usaha/pangan untuk menghindari ketergantungan.", "C. Proses impor barang dari luar negeri demi memenuhi kebutuhan pokok.", "D. Pemusnahan massal hama tanaman pangan menggunakan teknologi hayati.", "E. Penurunan harga jual komoditas secara drastis di pasar tradisional."], kunci: 1, pembahasan: "Jawaban: B. Diversifikasi berarti penganekaragaman agar tidak bergantung hanya pada satu jenis komoditas (beras)." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t4, pertanyaan: "20. Manakah kesimpulan yang paling tepat berdasarkan isi teks tersebut?", opsi: ["A. Indonesia harus segera menghentikan seluruh produksi padi dan beralih total ke sorgum.", "B. Krisis iklim global tidak akan memengaruhi ketahanan pangan selama pasokan padi aman.", "C. Kampanye diversifikasi pangan dan hilirisasi produk lokal penting untuk menjaga ketahanan pangan dari ancaman krisis iklim.", "D. Rasa pangan lokal secara alamiah mustahil diadopsi atau disukai oleh generasi muda saat ini.", "E. Lahan marginal di NTT adalah satu-satunya tempat yang bisa ditanami komoditas pangan."], kunci: 2, pembahasan: "Jawaban: C. Kesimpulan teks merangkum pentingnya kampanye diversifikasi dan hilirisasi produk pangan lokal demi ketahanan pangan." },
+
+            // Soal 21-25
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t5, pertanyaan: "21. Apa keunggulan utama platform pembelajaran berbasis AI yang disebutkan dalam teks?", opsi: ["A. Mampu menggantikan peran guru secara total di dalam kelas sehingga menghemat biaya.", "B. Dapat menganalisis karakteristik belajar siswa secara personal (personalized learning).", "C. Memberikan kelulusan otomatis kepada seluruh siswa tanpa perlu ujian.", "D. Menghapus materi pelajaran yang dianggap terlalu sulit oleh siswa secara sepihak.", "E. Menjamin siswa terbebas dari tugas-tugas sekolah selama satu semester penuh."], kunci: 1, pembahasan: "Jawaban: B. Keunggulan AI yang disebutkan adalah analisis gaya belajar secara personal (personalized learning)." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t5, pertanyaan: "22. Kata Walakin pada awal paragraf kedua merupakan konjungsi yang menyatakan hubungan...", opsi: ["A. Penambahan atau kelanjutan informasi.", "B. Pertentangan atau perlawanan dari pernyataan sebelumnya.", "C. Sebab-akibat atau konsekuensi logis.", "D. Pemilihan antara dua opsi atau lebih.", "E. Waktu atau urutan kronologis kejadian."], kunci: 1, pembahasan: "Jawaban: B. 'Walakin' adalah kata penghubung antarkalimat bahasa Indonesia arkais/baku yang berarti 'tetapi/akan tetapi' (pertentangan)." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t5, pertanyaan: "23. Apa dampak negatif terberat jika siswa terlalu bergantung pada penggunaan AI dalam pendidikan?", opsi: ["A. Kerusakan fisik pada layar komputer atau gawai milik siswa.", "B. Meningkatnya biaya operasional sekolah untuk membeli lisensi aplikasi.", "C. Potensi terkikisnya (erosi) kemampuan berpikir kritis siswa dalam menganalisis masalah.", "D. Penurunan jumlah guru secara drastis akibat pemutusan hubungan kerja.", "E. Hilangnya minat siswa untuk mengikuti kegiatan ekstrakurikuler olahraga."], kunci: 2, pembahasan: "Jawaban: C. Paragraf 2 menyebutkan kekhawatiran terbesar adalah erosi kemampuan berpikir kritis siswa." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t5, pertanyaan: "24. Mengapa peran guru tetap tidak tergantikan oleh teknologi AI secanggih apa pun?", opsi: ["A. Karena guru memiliki kemampuan teknis untuk memperbaiki kerusakan program AI.", "B. Karena aspek afektif seperti empati, etika, dan karakter moral hanya bisa diberikan oleh guru manusia.", "C. Karena biaya untuk menggaji guru jauh lebih murah daripada menyewa server AI.", "D. Karena guru memiliki kendali penuh atas nilai rapor akhir seluruh siswa di sekolah.", "E. Karena platform AI tidak memiliki akses terhadap buku teks kurikulum nasional."], kunci: 1, pembahasan: "Jawaban: B. Teks menyatakan aspek afektif (empati, etika, karakter moral) adalah domain mutlak guru manusia." },
+            { bagian: "Bagian 1: Teks Informasi (Soal 1 - 25)", teks: teksData.t5, pertanyaan: "25. Posisi ideal AI dalam dunia pendidikan menurut penulis teks tersebut adalah...", opsi: ["A. Pengganti utama peran pendidik di masa depan.", "B. Alat untuk menghapus sistem evaluasi atau ujian.", "C. Mitra akselerasi, bukan pengganti peran esensial pendidik.", "D. Sistem utama yang menentukan kelulusan siswa secara absolut.", "E. Sarana hiburan pengisi waktu luang saat jam kosong di sekolah."], kunci: 2, pembahasan: "Jawaban: C. Kalimat penutup teks menegaskan AI harus ditempatkan sebagai mitra akselerasi, bukan pengganti pendidik." },
+
+            // Soal 26-30
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t6, pertanyaan: "26. Latar suasana yang tergambar kuat pada paragraf pertama kutipan cerpen di atas adalah...", opsi: ["A. Ceria dan penuh harapan.", "B. Tegang, sunyi, dan penuh kecemasan.", "C. Riuh rendah dan penuh kegembiraan.", "D. Menakutkan dan mencekam karena perang.", "E. Damai, tenteram, dan romantis."], kunci: 1, pembahasan: "Jawaban: B. Lampu temaram, laut mengamuk, perahu bersandar pasrah, dan persediaan beras menipis membangun suasana tegang, sunyi, dan cemas." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t6, pertanyaan: "27. Apa makna simbolis dari klausa \"jalinan benang nilon, melainkan penyambung napas keluarga kami\" dalam teks?", opsi: ["A. Jala tersebut merupakan benda pusaka warisan nenek moyang mereka.", "B. Jala itu dibeli dengan harga yang sangat mahal dari luar kota.", "C. Jala tersebut adalah satu-satunya alat kerja yang menjadi sumber mata pencarian untuk bertahan hidup.", "D. Jala itu memiliki kekuatan gaib yang bisa mendatangkan ikan tanpa melaut.", "E. Benang nilon pada jala tersebut dapat digunakan untuk mengobati penyakit."], kunci: 2, pembahasan: "Jawaban: C. 'Penyambung napas' mewakili alat pencarian rezeki utama untuk bertahan hidup keluarga nelayan." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t6, pertanyaan: "28. Bagaimana watak tokoh Kakek berdasarkan kutipan cerpen tersebut?", opsi: ["A. Pemarah, tidak sabaran, dan suka mengeluh.", "B. Penakut, lemah, dan mudah putus asa menghadapi badai.", "C. Bijaksana, tenang, dan memiliki keteguhan hati.", "D. Acuh tak acuh dan tidak peduli pada nasib keluarganya.", "E. Sombong dan suka meremehkan kemampuan tokoh Ayah."], kunci: 2, pembahasan: "Jawaban: C. Ucapan Kakek 'Jangan cemas, Nak... Laut selalu tahu kapan harus marah dan kapan harus memberi' menunjukkan sifat bijaksana dan tenang." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t6, pertanyaan: "29. Penyebab konflik (ketegangan batin) yang dialami oleh tokoh Ayah dalam cerita adalah...", opsi: ["A. Perselisihan paham antara dirinya dengan tokoh Kakek mengenai cara merajut jala.", "B. Laut yang sedang mengamuk sehingga ia tidak bisa melaut, sementara persediaan beras menipis.", "C. Perahunya hancur berkeping-keping akibat menabrak karang yang tajam.", "D. Kakek yang menolak untuk beristirahat meskipun matanya sudah mulai lamur.", "E. Kekhawatiran akan adanya serangan dari perompak laut di malam hari."], kunci: 1, pembahasan: "Jawaban: B. Ayah menatap jendela dengan wajah menegang karena 3 hari laut mengamuk dan beras dapur menipis." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t6, pertanyaan: "30. Amanat yang dapat dipetik dari ucapan Kakek di akhir cerita adalah...", opsi: ["A. Kita harus mengeksploitasi laut saat cuaca sedang buruk agar mendapat hasil lebih.", "B. Manusia harus selalu bersabar, berpikir positif, dan menerima siklus alam dengan bijaksana.", "C. Nelayan sebaiknya mencari pekerjaan lain di kota besar jika laut sedang berombak.", "D. Kita tidak boleh mempercayai janji-janji yang diberikan oleh alam sekitar kita.", "E. Jangan pernah merajut jala di malam hari karena dapat merusak kesehatan mata."], kunci: 1, pembahasan: "Jawaban: B. Kakek mengajarkan agar bersabar dan menyikapi dinamika alam secara bijaksana." },
+
+            // Soal 31-35
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t7, pertanyaan: "31. Majas yang dominan terdapat pada kalimat \"Angka-angka di atas kertas itu seolah menjelma menjadi belati yang siap menikam impiannya\" adalah...", opsi: ["A. Personifikasi.", "B. Hiperbola.", "C. Metafora.", "D. Asosiasi / Simile.", "E. Ironi."], kunci: 3, pembahasan: "Jawaban: D. Penggunaan kata pembanding 'seolah' menandakan majas Asosiasi / Simile (mengumpamakan angka seperti belati)." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t7, pertanyaan: "32. Mengapa Laras merasa dunianya hancur setelah melihat lembar pengumuman tersebut?", opsi: ["A. Karena ia dipecat secara sepihak dari tempat kerjanya.", "B. Karena nilainya tidak mencukupi untuk mendapatkan beasiswa kedokteran yang diharapkan.", "C. Karena ibunya melarang dirinya untuk melanjutkan pendidikan ke perguruan tinggi.", "D. Karena kertas pengumuman miliknya dicuri oleh teman sekelasnya.", "E. Karena ia salah jadwal dan terlambat menghadiri ujian seleksi masuk perguruan tinggi."], kunci: 1, pembahasan: "Jawaban: B. Teks menyatakan nilai Laras membuat beasiswa kedokteran yang diidamkannya menguap." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t7, pertanyaan: "33. Sudut pandang penceritaan yang digunakan oleh penulis dalam kutipan novel tersebut adalah...", opsi: ["A. Orang pertama pelaku utama (Aku).", "B. Orang pertama pelaku sampingan.", "C. Orang ketiga serbatahu (Dia/Laras).", "D. Orang kedua sebagai pengamat.", "E. Sudut pandang campuran tak beraturan."], kunci: 2, pembahasan: "Jawaban: C. Penulis menggunakan kata ganti 'Ia/Laras' dan mengetahui perasaan serta pikiran batin tokoh (orang ketiga serbatahu)." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t7, pertanyaan: "34. Nilai moral/sosial yang terpancar dari sosok Ibu dalam kutipan tersebut adalah...", opsi: ["A. Keberanian melawan ketidakadilan sistem pendidikan.", "B. Kegigihan bekerja keras mencari nafkah dan ketulusan kasih sayang kepada anaknya.", "C. Keinginan kuat untuk memaksa anaknya menjadi seorang dokter yang kaya raya.", "D. Kepasrahan total tanpa melakukan usaha apa pun untuk mengubah nasib.", "E. Ketidakpedulian terhadap prestasi akademik yang diraih oleh anaknya."], kunci: 1, pembahasan: "Jawaban: B. Sosok Ibu digambarkan bekerja keras memeras pakaian (buruh cuci) dan menyambut anak dengan senyum tulus." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t7, pertanyaan: "35. Arti ungkapan melangkah gontai pada awal paragraf pertama menunjukkan bahwa tokoh Laras berjalan dengan...", opsi: ["A. Sangat cepat karena terburu-buru dikejar waktu.", "B. Penuh semangat, ceria, dan melompat-lompat kegirangan.", "C. Lemah, lambat, dan tidak bertenaga akibat sedih atau kecewa.", "D. Tegap dan angkuh karena merasa paling hebat di antara yang lain.", "E. Hati-hati karena jalanan yang dilewatinya sangat licin dan berlumpur."], kunci: 2, pembahasan: "Jawaban: C. Melangkah gontai bermakna berjalan dengan lemas, lambat, dan tanpa tenaga karena duka/kekecewaan." },
+
+            // Soal 36-40
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t8, pertanyaan: "36. Citraan (imaji) yang paling dominan pada baris \"Saat aspal-aspal berhenti bicara\" adalah citraan...", opsi: ["A. Penglihatan.", "B. Pendengaran.", "C. Perabaan.", "D. Penciuman.", "E. Gerak."], kunci: 1, pembahasan: "Jawaban: B. Kata 'berhenti bicara' berkaitan dengan suara/bunyi yang berhenti, merupakan citraan pendengaran (auditif)." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t8, pertanyaan: "37. Kata pintu tua dalam puisi tersebut secara konotatif merujuk pada simbol...", opsi: ["A. Rumah megah yang baru saja selesai dibangun di pusat kota.", "B. Masa lalu, kenangan lama, atau usia yang sudah senja.", "C. Kejahatan yang tersembunyi di dalam lorong-lorong sempit.", "D. Masa depan yang penuh dengan teknologi canggih.", "E. Alat transportasi tradisional yang sudah tidak digunakan lagi."], kunci: 1, pembahasan: "Jawaban: B. Pintu tua menyimbolkan masa lalu, kenangan lama, atau perjalanan usia." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t8, pertanyaan: "38. Suasana yang dibangun oleh penyair dalam puisi \"Sajak Tengah Malam\" adalah...", opsi: ["A. Riang gembira dan penuh optimisme.", "B. Sunyi, melankolis, dan penuh perenungan/kerinduan.", "C. Marah, emosional, dan penuh protest sosial.", "D. Menakutkan, seram, dan penuh misteri mistis.", "E. Lucu, menggelikan, dan menghibur pembaca."], kunci: 1, pembahasan: "Jawaban: B. Pemilihan kata (aspal berhenti bicara, mengeja sepi, rindu mengetuk) membangun suasana sunyi dan melankolis." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t8, pertanyaan: "39. Apa maksud dari baris terakhir: \"Yang terus berdetak, menggilas usia\"?", opsi: ["A. Waktu yang berjalan lambat membuat manusia bosan menunggu.", "B. Penggunaan jam dinding elektronik yang merusak memori manusia.", "C. Waktu yang terus berjalan maju tanpa bisa dihentikan, mengurangi sisa umur manusia.", "D. Usia muda adalah waktu yang paling tepat untuk merusak tatanan kota.", "E. Jam dinding yang rusak akibat hantaman benda keras di tengah malam."], kunci: 2, pembahasan: "Jawaban: C. Berdetak menggilas usia berarti waktu berjalan konstan dan mengikis sisa umur manusia." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t8, pertanyaan: "40. Majas personifikasi dalam puisi di atas ditunjukkan pada baris-baris berikut, kecuali...", opsi: ["A. Aspal-aspal berhenti bicara.", "B. Lampu merkuri mulai mengeja sepi.", "C. Rindu mengetuk pintu tua.", "D. Ke mana perginya riuh kota?", "E. Sang waktu yang terus berdetak."], kunci: 3, pembahasan: "Jawaban: D. 'Ke mana perginya riuh kota?' adalah kalimat tanya retoris, bukan majas personifikasi." },
+
+            // Soal 41-45
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t9, pertanyaan: "41. Berdasarkan petunjuk lakuan (kramagung) dalam teks, bagaimana kondisi emosi tokoh Hadi?", opsi: ["A. Sangat gembira karena mendapat bonus gaji.", "B. Sedih dan menangis tersedu-sedu di pojokan.", "C. Sangat marah, kesal, dan merasa tidak adil.", "D. Takut dan gemetar karena dikejar musuh.", "E. Tenang, santai, dan tidak memikirkan pekerjaan."], kunci: 2, pembahasan: "Jawaban: C. Petunjuk lakuan '(Melempar tasnya... wajahnya merah padam)' menggambarkan kemarahan dan kekesalan." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t9, pertanyaan: "42. Apa yang memicu konflik antartokoh dalam penggalan drama tersebut?", opsi: ["A. Ibu yang menolak membuatkan Hadi minum air hangat setelah pulang kerja.", "B. Hasil kerja keras Hadi (laporan analisis) diklaim dan dipuji atas nama orang lain (Baskoro).", "C. Hadi yang merusak tas kerja mahalnya dengan cara melemparnya ke kursi.", "D. Baskoro yang mengusir keluarga Hadi dari rumah susun yang mereka tempati.", "E. Ibu yang memaksa Hadi untuk keluar dari pekerjaannya saat itu juga."], kunci: 1, pembahasan: "Jawaban: B. Hadi marah karena laporan analisis yang dikerjakannya lembur malah dipujikan kepada Baskoro." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t9, pertanyaan: "43. Karakter tokoh Ibu dalam kutipan drama di atas adalah...", opsi: ["A. Provokatif, ikut memanaskan suasana hati anak.", "B. Penenang, bijaksana, dan penuh kasih sayang.", "C. Penakut, lemah, dan selalu menyalahkan keadaan.", "D. Materialistis, hanya mementingkan uang dan jabatan.", "E. Acuh tak acuh terhadap keluh kesah yang disampaikan anak."], kunci: 1, pembahasan: "Jawaban: B. Karakter Ibu bijaksana dan menenangkan: 'Tenang dulu... Amarah tidak akan pernah mengembalikan hakmu yang dicuri.'" },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t9, pertanyaan: "44. Makna kata peluh pada kalimat terakhir dialog Hadi adalah...", opsi: ["A. Air mata yang keluar karena kesedihan mendalam.", "B. Kerja keras, usaha nyata, dan tetesan keringat dalam bekerja.", "C. Harta benda warisan yang ditinggalkan orang tua.", "D. Pakaian dinas harian yang kotor dan belum dicuci.", "E. Penyakit demam yang diderita akibat kelelahan."], kunci: 1, pembahasan: "Jawaban: B. Kata 'peluh' secara kiasan merujuk pada hasil keringat, kerja keras, dan usaha keras." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t9, pertanyaan: "45. Bagaimana latar tempat kejadian dalam penggalan drama tersebut?", opsi: ["A. Kantor perusahaan multinasional yang mewah di pusat kota.", "B. Taman bermain anak di dekat kompleks perumahan elite.", "C. Ruang tamu rumah susun yang sederhana.", "D. Sebuah warung kopi di pinggir jalan raya yang ramai.", "E. Stasiun kereta api saat kondisi hujan deras."], kunci: 2, pembahasan: "Jawaban: C. Latar tempat tertulis eksplisit di petunjuk panggung: 'Ruang tamu rumah susun yang sederhana.'" },
+
+            // Soal 46-50
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t10, pertanyaan: "46. Apa kelemahan tokoh Kuki si Burung Kolibri yang menjadi bumerang bagi dirinya sendiri saat badai?", opsi: ["A. Tubuhnya terlalu besar sehingga mudah dijadikan sasaran hewan buas.", "B. Sifatnya yang sombong dan tubuhnya yang ringan sehingga tak berdaya dihantam angin kencang badai.", "C. Penglihatan matanya yang sangat buruk di malam hari yang gelap.", "D. Ketidakmampuannya untuk terbang tinggi di atas pohon-pohon besar.", "E. Selalu mendengarkan nasihat dari Tiko si Kura-Kura Darat."], kunci: 1, pembahasan: "Jawaban: B. Kesombongan dan tubuhnya yang ringan membuat Kuki terombang-ambing badai hingga sayapnya patah." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t10, pertanyaan: "47. Bagaimana Tiko si Kura-Kura Darat menyelamatkan dirinya dari amukan badai?", opsi: ["A. Terbang tinggi bermigrasi ke pulau seberang sebelum badai datang.", "B. Bersembunyi di dalam lubang lumpur yang digalinya bersama kawanan cacing.", "C. Menarik seluruh badannya masuk ke dalam tempurung kerasnya yang kokoh.", "D. Meminta bantuan Kuki untuk menggendongnya ke atas bukit perlindungan.", "E. Menggunakan dedaunan lebar sebagai payung pelindung tubuhnya."], kunci: 2, pembahasan: "Jawaban: C. Paragraf 2 menyatakan Tiko menarik badannya ke dalam tempurung kerasnya yang kokoh." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t10, pertanyaan: "48. Pesan moral implisit dari kutipan fabel tersebut adalah...", opsi: ["A. Kecepatan fisik adalah satu-satunya penentu keselamatan dalam hidup.", "B. Jangan pernah berjalan lambat jika tidak ingin ditinggalkan oleh teman-teman.", "C. Jangan sombong atas kelebihanmu, karena setiap makhluk memiliki pertahanan dan kelebihannya masing-masing.", "D. Kita harus selalu menebang pohon di hutan sebelum musim badai tahunan tiba.", "E. Bertubuh ringan adalah sebuah kerugian mutlak bagi semua jenis burung."], kunci: 2, pembahasan: "Jawaban: C. Fabel mengajarkan untuk tidak menyombongkan kelebihan karena tiap makhluk punya kelebihan/pertahanan sendiri." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t10, pertanyaan: "49. Kata konsisten pada paragraf pertama bermakna...", opsi: ["A. Berubah-ubah sesuai dengan situasi dan kondisi sekitar.", "B. Tetap pada pendirian, taat asas, dan terus-menerus dilakukan secara selaras.", "C. Dilakukan dengan rasa malas dan keterpaksaan yang tinggi.", "D. Mengikuti arahan atau perintah dari individu yang lebih berkuasa.", "E. Memiliki kecepatan yang melebihi batas rata-rata makhluk lain."], kunci: 1, pembahasan: "Jawaban: B. Konsisten bermakna taat asas, teguh pada pendirian, dan dilakukan secara terus-menerus." },
+            { bagian: "Bagian 2: Teks Fiksi & Sastra (Soal 26 - 50)", teks: teksData.t10, pertanyaan: "50. Struktur teks fabel pada paragraf kedua dalam teori sastra disebut sebagai tahapan...", opsi: ["A. Orientasi (pengenalan tokoh dan latar).", "B. Komplikasi (awal munculnya masalah awal).", "C. Resolusi / Koda (penyelesaian masalah dan akibat akhir).", "D. Abstrak (ringkasan inti cerita sebelum dimulai).", "E. Krisis (puncak perselisihan antartokoh utama)."], kunci: 2, pembahasan: "Jawaban: C. Paragraf kedua menggambarkan akibat akhir dari perbuatan Kuki dan bagaimana masalah badai terselesaikan (Resolusi/Koda)." }
+        ];
+
+        let currentIndex = 0;
+        let userAnswers = {};
+        let statusJawab = {};
+        let namaUser = "", kelasUser = "";
+        let timeLeft = 3600;
+        let timerInterval = null;
+
+        function startQuiz() {
+            namaUser = document.getElementById('input-nama').value.trim();
+            kelasUser = document.getElementById('input-kelas').value.trim();
+            if (!namaUser || !kelasUser) return alert('Mohon isi nama dan kelas!');
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+            document.getElementById('timer-box').style.display = 'block';
+
+            startTimer();
+            renderSoal();
+            renderNav();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                let m = Math.floor(timeLeft / 60);
+                let s = timeLeft % 60;
+                document.getElementById('timer-box').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                if (timeLeft <= 0) finishQuiz();
+            }, 1000);
+        }
+
+        function renderSoal() {
+            const data = soalData[currentIndex];
+            document.getElementById('txt-bagian').innerText = data.bagian;
+            document.getElementById('txt-nomor').innerText = `Soal ${currentIndex + 1} dari ${soalData.length}`;
+            document.getElementById('txt-bacaan').innerText = data.teks;
+            document.getElementById('txt-soal').innerText = data.pertanyaan;
+
+            const optBox = document.getElementById('options-box');
+            optBox.innerHTML = '';
+            document.getElementById('exp-box').style.display = 'none';
+
+            data.opsi.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+
+                if (statusJawab[currentIndex]) {
+                    if (idx === data.kunci) btn.classList.add('correct');
+                    else if (userAnswers[currentIndex] === idx && statusJawab[currentIndex] === 'salah') btn.classList.add('wrong');
+                } else {
+                    btn.onclick = () => selectOption(idx);
+                }
+                optBox.appendChild(btn);
+            });
+
+            if (statusJawab[currentIndex] === 'salah') {
+                const expBox = document.getElementById('exp-box');
+                expBox.style.display = 'block';
+                expBox.innerHTML = `<strong>❌ Jawaban Kurang Tepat</strong><br><strong>Pembahasan:</strong> ${data.pembahasan}<br><button class="next-btn" onclick="nextSoal()">Soal Berikutnya &rarr;</button>`;
+            }
+            renderNav();
+        }
+
+        function selectOption(idx) {
+            const data = soalData[currentIndex];
+            const isCorrect = idx === data.kunci;
+            userAnswers[currentIndex] = idx;
+            statusJawab[currentIndex] = isCorrect ? 'benar' : 'salah';
+
+            if (isCorrect) {
+                setTimeout(() => nextSoal(), 700);
+            } else {
+                renderSoal();
+            }
+        }
+
+        function nextSoal() {
+            if (currentIndex < soalData.length - 1) {
+                currentIndex++;
+                renderSoal();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function renderNav() {
+            const navBox = document.getElementById('nav-box');
+            navBox.innerHTML = '';
+            soalData.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.className = `num-btn ${i === currentIndex ? 'active' : ''}`;
+                if (statusJawab[i] === 'benar') btn.classList.add('c-correct');
+                if (statusJawab[i] === 'salah') btn.classList.add('c-wrong');
+                btn.innerText = i + 1;
+                btn.onclick = () => { currentIndex = i; renderSoal(); };
+                navBox.appendChild(btn);
+            });
+        }
+
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('timer-box').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+
+            let score = 0;
+            soalData.forEach((s, i) => { if (userAnswers[i] === s.kunci) score += (100 / soalData.length); });
+            score = Math.round(score);
+
+            document.getElementById('result-text').innerHTML = `Terima kasih <strong>${namaUser}</strong> (${kelasUser}).<br>Skor Akhir Anda: <span style="font-size: 1.6rem; color: #4338ca; font-weight: bold;">${score}</span> / 100`;
+
+            let history = JSON.parse(localStorage.getItem('tka_history') || '[]');
+            history.unshift({ nama: namaUser, kelas: kelasUser, skor: score, tanggal: new Date().toLocaleDateString('id-ID') });
+            localStorage.setItem('tka_history', JSON.stringify(history));
+
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            history.forEach((h, i) => {
+                tbody.innerHTML += `<tr><td>${i+1}</td><td>${h.nama}</td><td>${h.kelas}</td><td><strong>${h.skor}</strong></td><td>${h.tanggal}</td></tr>`;
+            });
+        }
+    </script>
+</body>
+</html>
